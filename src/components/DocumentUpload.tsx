@@ -1,0 +1,309 @@
+
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent } from '@/components/ui/card';
+import { ArrowLeft, Upload, Plus, FileText, X, Eye } from 'lucide-react';
+import { FinancialEntity } from './ApplicationWindow';
+import { toast } from '@/hooks/use-toast';
+
+interface DocumentUploadProps {
+  entity: FinancialEntity;
+  onBack: () => void;
+  onFilesUploaded: () => void;
+}
+
+interface Dataset {
+  id: string;
+  name: string;
+  files: UploadedFile[];
+}
+
+interface UploadedFile {
+  id: string;
+  name: string;
+  type: string;
+  size: number;
+  hash: string;
+  uploadDate: Date;
+}
+
+const defaultDatasets: Dataset[] = [
+  { id: 'informes-tecnicos', name: 'Dataset Informes Técnicos SBS', files: [] },
+  { id: 'informes-auditoria', name: 'Dataset Informes de Auditoría', files: [] },
+  { id: 'informes-seguimiento', name: 'Dataset Informes de Seguimiento y Recomendaciones', files: [] }
+];
+
+export const DocumentUpload = ({ entity, onBack, onFilesUploaded }: DocumentUploadProps) => {
+  const [datasets, setDatasets] = useState<Dataset[]>(defaultDatasets);
+  const [selectedDataset, setSelectedDataset] = useState<string | null>(null);
+  const [previewFile, setPreviewFile] = useState<UploadedFile | null>(null);
+  const [newDatasetName, setNewDatasetName] = useState('');
+  const [showNewDatasetForm, setShowNewDatasetForm] = useState(false);
+
+  const generateFileHash = (fileName: string): string => {
+    return `SBS-${Math.random().toString(36).substr(2, 9).toUpperCase()}`;
+  };
+
+  const handleFileUpload = (datasetId: string, files: FileList) => {
+    const allowedTypes = ['application/pdf', 'application/msword', 
+                         'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 
+                         'text/plain'];
+    
+    const newFiles: UploadedFile[] = [];
+    
+    Array.from(files).forEach(file => {
+      if (!allowedTypes.includes(file.type)) {
+        toast({
+          title: "Archivo no permitido",
+          description: `${file.name} no es un tipo de archivo permitido`,
+          variant: "destructive"
+        });
+        return;
+      }
+
+      const uploadedFile: UploadedFile = {
+        id: Math.random().toString(36).substr(2, 9),
+        name: file.name,
+        type: file.type,
+        size: file.size,
+        hash: generateFileHash(file.name),
+        uploadDate: new Date()
+      };
+      
+      newFiles.push(uploadedFile);
+      
+      toast({
+        title: "Archivo cargado exitosamente",
+        description: `Código hash asignado: ${uploadedFile.hash}`,
+      });
+    });
+
+    if (newFiles.length > 0) {
+      setDatasets(prev => prev.map(dataset => 
+        dataset.id === datasetId 
+          ? { ...dataset, files: [...dataset.files, ...newFiles] }
+          : dataset
+      ));
+      onFilesUploaded();
+    }
+  };
+
+  const addNewDataset = () => {
+    if (!newDatasetName.trim()) return;
+    
+    const newDataset: Dataset = {
+      id: `custom-${Date.now()}`,
+      name: newDatasetName,
+      files: []
+    };
+    
+    setDatasets(prev => [...prev, newDataset]);
+    setNewDatasetName('');
+    setShowNewDatasetForm(false);
+    
+    toast({
+      title: "Dataset creado",
+      description: `Se ha creado el dataset: ${newDatasetName}`
+    });
+  };
+
+  const getFileIcon = (type: string) => {
+    return <FileText className="h-8 w-8 text-blue-600" />;
+  };
+
+  if (selectedDataset) {
+    const dataset = datasets.find(d => d.id === selectedDataset);
+    if (!dataset) return null;
+
+    return (
+      <div className="flex h-full">
+        <div className="flex-1 p-6">
+          <div className="mb-6">
+            <Button
+              variant="ghost"
+              onClick={() => setSelectedDataset(null)}
+              className="mb-4"
+            >
+              <ArrowLeft className="h-4 w-4 mr-2" />
+              Volver a Datasets
+            </Button>
+            
+            <h2 className="text-2xl font-bold text-gray-900 mb-2">
+              Carga de Archivos - {dataset.name}
+            </h2>
+            <p className="text-gray-600">
+              {entity.name} - {entity.license}
+            </p>
+          </div>
+
+          <div className="mb-6">
+            <input
+              type="file"
+              multiple
+              accept=".pdf,.doc,.docx,.txt"
+              onChange={(e) => {
+                if (e.target.files) {
+                  handleFileUpload(selectedDataset, e.target.files);
+                }
+              }}
+              className="hidden"
+              id="file-upload"
+            />
+            <label htmlFor="file-upload">
+              <Button className="cursor-pointer" asChild>
+                <div>
+                  <Upload className="h-4 w-4 mr-2" />
+                  Cargar Archivos
+                </div>
+              </Button>
+            </label>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+            {dataset.files.map(file => (
+              <Card 
+                key={file.id} 
+                className="cursor-pointer hover:shadow-md transition-shadow"
+                onClick={() => setPreviewFile(file)}
+              >
+                <CardContent className="p-4 text-center">
+                  {getFileIcon(file.type)}
+                  <div className="mt-2">
+                    <p className="text-sm font-medium text-gray-900 truncate">
+                      {file.name}
+                    </p>
+                    <p className="text-xs text-gray-500 mt-1">
+                      {(file.size / 1024).toFixed(1)} KB
+                    </p>
+                    <p className="text-xs text-blue-600 font-mono mt-1">
+                      {file.hash}
+                    </p>
+                  </div>
+                </CardContent>
+              </Card>
+            ))}
+          </div>
+        </div>
+
+        {previewFile && (
+          <div className="w-1/2 border-l bg-gray-50 p-6">
+            <div className="flex items-center justify-between mb-4">
+              <h3 className="text-lg font-semibold">Previsualización</h3>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setPreviewFile(null)}
+              >
+                <X className="h-4 w-4" />
+              </Button>
+            </div>
+            
+            <div className="bg-white rounded-lg border p-6 h-96 flex items-center justify-center">
+              <div className="text-center">
+                {getFileIcon(previewFile.type)}
+                <p className="mt-4 font-medium">{previewFile.name}</p>
+                <p className="text-sm text-gray-500 mt-2">
+                  Código: {previewFile.hash}
+                </p>
+                <p className="text-xs text-gray-400 mt-1">
+                  Subido: {previewFile.uploadDate.toLocaleString()}
+                </p>
+              </div>
+            </div>
+          </div>
+        )}
+      </div>
+    );
+  }
+
+  return (
+    <div className="p-6">
+      <div className="mb-6">
+        <Button
+          variant="ghost"
+          onClick={onBack}
+          className="mb-4"
+        >
+          <ArrowLeft className="h-4 w-4 mr-2" />
+          Volver
+        </Button>
+        
+        <h2 className="text-2xl font-bold text-gray-900 mb-2">
+          Aplicación de Carga Documental
+        </h2>
+        <p className="text-gray-600">
+          {entity.name} - {entity.license}
+        </p>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        {datasets.map(dataset => (
+          <Card 
+            key={dataset.id}
+            className="cursor-pointer hover:shadow-lg transition-shadow"
+            onClick={() => setSelectedDataset(dataset.id)}
+          >
+            <CardContent className="p-6 text-center">
+              <div className="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+                <FileText className="h-8 w-8 text-blue-600" />
+              </div>
+              <h3 className="font-semibold text-gray-900 mb-2">
+                {dataset.name}
+              </h3>
+              <p className="text-sm text-gray-500">
+                {dataset.files.length} archivo{dataset.files.length !== 1 ? 's' : ''}
+              </p>
+            </CardContent>
+          </Card>
+        ))}
+
+        <Card 
+          className="cursor-pointer hover:shadow-lg transition-shadow border-dashed border-2 border-gray-300"
+          onClick={() => setShowNewDatasetForm(true)}
+        >
+          <CardContent className="p-6 text-center">
+            <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4">
+              <Plus className="h-8 w-8 text-gray-400" />
+            </div>
+            <h3 className="font-semibold text-gray-600 mb-2">
+              Agregar Dataset
+            </h3>
+            <p className="text-sm text-gray-400">
+              Crear nuevo dataset
+            </p>
+          </CardContent>
+        </Card>
+      </div>
+
+      {showNewDatasetForm && (
+        <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+          <div className="bg-white rounded-lg p-6 w-96">
+            <h3 className="text-lg font-semibold mb-4">Nuevo Dataset</h3>
+            <input
+              type="text"
+              placeholder="Nombre del dataset"
+              value={newDatasetName}
+              onChange={(e) => setNewDatasetName(e.target.value)}
+              className="w-full p-2 border rounded mb-4"
+            />
+            <div className="flex space-x-2">
+              <Button onClick={addNewDataset} className="flex-1">
+                Crear
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={() => {
+                  setShowNewDatasetForm(false);
+                  setNewDatasetName('');
+                }}
+                className="flex-1"
+              >
+                Cancelar
+              </Button>
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+};
