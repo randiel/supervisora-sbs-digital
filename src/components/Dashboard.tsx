@@ -1,7 +1,9 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
+import { ToggleGroup, ToggleGroupItem } from '@/components/ui/toggle-group';
 import { Menu, User, Search, Shield, FileText } from 'lucide-react';
 import { User as UserType, Application } from '@/pages/Index';
 import { Sidebar } from './Sidebar';
@@ -33,8 +35,17 @@ const specializedApplications: Application[] = [
   }
 ];
 
+const topicFilters = [
+  'Todos los tópicos',
+  'Confiabilidad de datos',
+  'Supervisión de gestión de riesgos de mercado',
+  'Supervisión de gestión de riesgos de liquidez',
+  'Supervisión de riesgos de conglomerados'
+];
+
 export const Dashboard = ({ user, onSelectApp, onLogout }: DashboardProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [selectedTopics, setSelectedTopics] = useState<string[]>(['Todos los tópicos']);
 
   const getAppIcon = (appId: string) => {
     switch (appId) {
@@ -46,6 +57,20 @@ export const Dashboard = ({ user, onSelectApp, onLogout }: DashboardProps) => {
         return FileText;
       default:
         return FileText;
+    }
+  };
+
+  const handleTopicChange = (value: string[]) => {
+    if (value.includes('Todos los tópicos')) {
+      // Si se selecciona "Todos los tópicos", deseleccionar todos los otros
+      if (selectedTopics.includes('Todos los tópicos')) {
+        setSelectedTopics(value.filter(v => v !== 'Todos los tópicos'));
+      } else {
+        setSelectedTopics(['Todos los tópicos']);
+      }
+    } else {
+      // Si se selecciona cualquier otro tópico, deseleccionar "Todos los tópicos"
+      setSelectedTopics(value.filter(v => v !== 'Todos los tópicos'));
     }
   };
 
@@ -156,6 +181,28 @@ export const Dashboard = ({ user, onSelectApp, onLogout }: DashboardProps) => {
               <p className="text-gray-600 mb-4">
                 Estás aplicaciones están enfocadas a ciertos productos del sistema financiero y permiten realizar análisis cruzados
               </p>
+              
+              {/* Filtro de Tópicos */}
+              <div className="mb-6">
+                <h4 className="text-sm font-medium text-gray-700 mb-3">Filtrar por tópico:</h4>
+                <ToggleGroup
+                  type="multiple"
+                  value={selectedTopics}
+                  onValueChange={handleTopicChange}
+                  className="flex flex-wrap gap-2 justify-start"
+                >
+                  {topicFilters.map((topic) => (
+                    <ToggleGroupItem
+                      key={topic}
+                      value={topic}
+                      className="text-sm px-3 py-2 rounded-md border border-gray-300 data-[state=on]:bg-blue-600 data-[state=on]:text-white data-[state=on]:border-blue-600 hover:bg-gray-50"
+                    >
+                      {topic}
+                    </ToggleGroupItem>
+                  ))}
+                </ToggleGroup>
+              </div>
+
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {renderApplications(specializedApplications)}
               </div>
