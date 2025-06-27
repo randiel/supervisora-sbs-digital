@@ -1,7 +1,7 @@
 
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
-import { User, Home, Settings, LogOut, Shield } from 'lucide-react';
+import { Home, Settings, LogOut, Shield } from 'lucide-react';
 import { User as UserType } from '@/pages/Index';
 
 interface SidebarProps {
@@ -14,7 +14,7 @@ interface SidebarProps {
 export const Sidebar = ({ isOpen, onClose, user, onLogout }: SidebarProps) => {
   const menuItems = [
     { icon: Home, label: 'Dashboard', action: onClose },
-    { icon: User, label: 'Perfil', action: () => {} },
+    { icon: () => <img src="/lovable-uploads/c2d804d2-3ef6-4777-ba96-73e5ab43dc93.png" alt="Usuario" className="h-5 w-5" />, label: 'Perfil', action: () => {} },
     { icon: Settings, label: 'Configuración', action: () => {} },
     { icon: Shield, label: 'Seguridad', action: () => {} },
   ];
@@ -40,7 +40,11 @@ export const Sidebar = ({ isOpen, onClose, user, onLogout }: SidebarProps) => {
           <div className="bg-blue-50 rounded-lg p-4">
             <div className="flex items-center space-x-3">
               <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
-                <User className="h-6 w-6 text-white" />
+                <img 
+                  src="/lovable-uploads/c2d804d2-3ef6-4777-ba96-73e5ab43dc93.png" 
+                  alt="Usuario" 
+                  className="h-6 w-6 text-white"
+                />
               </div>
               <div>
                 <div className="font-medium text-gray-900">{user.name}</div>

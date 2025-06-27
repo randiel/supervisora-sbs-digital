@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Menu, User, Search, Shield, FileText, TrendingUp } from 'lucide-react';
+import { Menu, Search, Shield, FileText, TrendingUp } from 'lucide-react';
 import { User as UserType, Application } from '@/pages/Index';
 import { Sidebar } from './Sidebar';
 
@@ -141,7 +141,11 @@ export const Dashboard = ({ user, onSelectApp, onLogout }: DashboardProps) => {
           
           <div className="flex items-center space-x-4">
             <div className="flex items-center space-x-2">
-              <User className="h-5 w-5 text-gray-600" />
+              <img 
+                src="/lovable-uploads/c2d804d2-3ef6-4777-ba96-73e5ab43dc93.png" 
+                alt="Usuario" 
+                className="h-5 w-5 text-gray-600"
+              />
               <div className="text-sm">
                 <div className="font-medium text-gray-900">{user.name}</div>
                 <div className="text-gray-500">{user.role}</div>
