@@ -1,3 +1,4 @@
+
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { User, Home, Settings, LogOut, Shield } from 'lucide-react';
@@ -29,7 +30,7 @@ export const Sidebar = ({ isOpen, onClose, user, onLogout }: SidebarProps) => {
               className="w-10 h-10 object-contain"
             />
             <div>
-              <SheetTitle className="text-left">Plataforma de Supervisión</SheetTitle>
+              <SheetTitle className="text-left">Asistente de Supervisión</SheetTitle>
               <p className="text-sm text-gray-500">SBS Perú</p>
             </div>
           </div>

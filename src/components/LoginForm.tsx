@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -43,7 +44,7 @@ export const LoginForm = ({ onLogin }: LoginFormProps) => {
       onLogin(email);
       toast({
         title: "Acceso exitoso",
-        description: "Bienvenido a la Plataforma de Supervisión SBS"
+        description: "Bienvenido al Asistente de Supervisión SBS"
       });
     }, 1500);
   };
@@ -74,7 +75,7 @@ export const LoginForm = ({ onLogin }: LoginFormProps) => {
             />
           </div>
           <div>
-            <h1 className="text-3xl font-bold text-gray-900">Plataforma de Supervisión</h1>
+            <h1 className="text-3xl font-bold text-gray-900">Asistente de Supervisión</h1>
             <p className="text-gray-600 mt-2">Superintendencia de Banca, Seguros y AFP</p>
             <Badge variant="outline" className="mt-2">República del Perú</Badge>
           </div>

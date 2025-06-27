@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -67,7 +68,7 @@ export const Dashboard = ({ user, onSelectApp, onLogout }: DashboardProps) => {
                 className="w-8 h-8 object-contain"
               />
               <h1 className="text-xl font-semibold text-gray-900">
-                Plataforma de Supervisión
+                Asistente de Supervisión
               </h1>
             </div>
           </div>
