@@ -13,12 +13,15 @@ interface DashboardProps {
   onLogout: () => void;
 }
 
-const applications: Application[] = [
+const transversalApplications: Application[] = [
   {
     id: 'busqueda-documental',
     name: 'Búsqueda Documental',
     description: 'Sistema de gestión y búsqueda de documentos regulatorios'
-  },
+  }
+];
+
+const specializedApplications: Application[] = [
   {
     id: 'garantias-preferidas',
     name: 'Garantías Preferidas',
@@ -45,6 +48,41 @@ export const Dashboard = ({ user, onSelectApp, onLogout }: DashboardProps) => {
       default:
         return FileText;
     }
+  };
+
+  const renderApplications = (applications: Application[]) => {
+    return applications.map((app) => {
+      const IconComponent = getAppIcon(app.id);
+      return (
+        <Card 
+          key={app.id} 
+          className="hover:shadow-lg transition-all duration-200 cursor-pointer border-0 shadow-md"
+          onClick={() => onSelectApp(app)}
+        >
+          <CardHeader className="pb-4">
+            <div className="flex items-center space-x-3 mb-2">
+              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                <IconComponent className="h-5 w-5 text-blue-600" />
+              </div>
+              <Badge variant="secondary" className="text-xs">
+                SBS
+              </Badge>
+            </div>
+            <CardTitle className="text-lg leading-tight">
+              {app.name}
+            </CardTitle>
+          </CardHeader>
+          <CardContent>
+            <p className="text-gray-600 text-sm mb-4">
+              {app.description}
+            </p>
+            <Button className="w-full bg-blue-600 hover:bg-blue-700">
+              Acceder
+            </Button>
+          </CardContent>
+        </Card>
+      );
+    });
   };
 
   return (
@@ -97,39 +135,26 @@ export const Dashboard = ({ user, onSelectApp, onLogout }: DashboardProps) => {
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {applications.map((app) => {
-              const IconComponent = getAppIcon(app.id);
-              return (
-                <Card 
-                  key={app.id} 
-                  className="hover:shadow-lg transition-all duration-200 cursor-pointer border-0 shadow-md"
-                  onClick={() => onSelectApp(app)}
-                >
-                  <CardHeader className="pb-4">
-                    <div className="flex items-center space-x-3 mb-2">
-                      <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                        <IconComponent className="h-5 w-5 text-blue-600" />
-                      </div>
-                      <Badge variant="secondary" className="text-xs">
-                        SBS
-                      </Badge>
-                    </div>
-                    <CardTitle className="text-lg leading-tight">
-                      {app.name}
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent>
-                    <p className="text-gray-600 text-sm mb-4">
-                      {app.description}
-                    </p>
-                    <Button className="w-full bg-blue-600 hover:bg-blue-700">
-                      Acceder
-                    </Button>
-                  </CardContent>
-                </Card>
-              );
-            })}
+          <div className="space-y-8">
+            {/* Análisis Transversal */}
+            <div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                Análisis Transversal
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {renderApplications(transversalApplications)}
+              </div>
+            </div>
+
+            {/* Análisis Especializado */}
+            <div>
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                Análisis Especializado
+              </h3>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {renderApplications(specializedApplications)}
+              </div>
+            </div>
           </div>
         </div>
       </main>
