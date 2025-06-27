@@ -39,11 +39,12 @@ export const Sidebar = ({ isOpen, onClose, user, onLogout }: SidebarProps) => {
         <div className="space-y-6">
           <div className="bg-blue-50 rounded-lg p-4">
             <div className="flex items-center space-x-3">
-              <div className="w-12 h-12 bg-blue-600 rounded-full flex items-center justify-center">
+              <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
                 <img 
                   src="/lovable-uploads/c2d804d2-3ef6-4777-ba96-73e5ab43dc93.png" 
                   alt="Usuario" 
-                  className="h-6 w-6 text-white"
+                  className="h-6 w-6 object-contain brightness-0"
+                  style={{ filter: 'brightness(0) saturate(100%) invert(22%) sepia(58%) saturate(1825%) hue-rotate(199deg) brightness(95%) contrast(101%)' }}
                 />
               </div>
               <div>

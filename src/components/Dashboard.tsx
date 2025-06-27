@@ -144,7 +144,7 @@ export const Dashboard = ({ user, onSelectApp, onLogout }: DashboardProps) => {
               <img 
                 src="/lovable-uploads/c2d804d2-3ef6-4777-ba96-73e5ab43dc93.png" 
                 alt="Usuario" 
-                className="h-5 w-5 text-gray-600"
+                className="h-5 w-5 object-contain"
               />
               <div className="text-sm">
                 <div className="font-medium text-gray-900">{user.name}</div>
