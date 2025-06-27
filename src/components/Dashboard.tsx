@@ -23,12 +23,12 @@ const transversalApplications: Application[] = [
 const specializedApplications: Application[] = [
   {
     id: 'garantias-preferidas',
-    name: 'Garantías Preferidas',
+    name: 'Evaluación de Garantías Preferidas',
     description: 'Gestión y análisis de garantías preferidas del sistema financiero'
   },
   {
     id: 'cartas-fianza',
-    name: 'Cartas Fianza',
+    name: 'Evaluación de Cartas Fianza',
     description: 'Supervisión y control de cartas fianza emitidas en el sistema financiero'
   }
 ];
