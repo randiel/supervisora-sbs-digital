@@ -28,9 +28,9 @@ interface UploadedFile {
 }
 
 const defaultDatasets: Dataset[] = [
-  { id: 'informes-tecnicos', name: 'Dataset Informes Técnicos SBS', files: [] },
-  { id: 'informes-auditoria', name: 'Dataset Informes de Auditoría', files: [] },
-  { id: 'informes-seguimiento', name: 'Dataset Informes de Seguimiento y Recomendaciones', files: [] }
+  { id: 'informes-tecnicos', name: 'Informes Técnicos SBS', files: [] },
+  { id: 'informes-auditoria', name: 'Informes de Auditoría', files: [] },
+  { id: 'informes-seguimiento', name: 'Informes de Seguimiento y Recomendaciones', files: [] }
 ];
 
 export const DocumentUpload = ({ entity, onBack, onFilesUploaded }: DocumentUploadProps) => {
