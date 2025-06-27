@@ -170,7 +170,7 @@ export const Dashboard = ({ user, onSelectApp, onLogout }: DashboardProps) => {
               
               {/* Filtro de Tópicos */}
               <div className="mb-6">
-                <h4 className="text-sm font-medium text-gray-700 mb-3">Filtrar por tópico:
+                <h4 className="text-sm font-medium text-gray-700 mb-3">Filtrar por tópico:</h4>
                 <Select value={selectedTopic} onValueChange={setSelectedTopic}>
                   <SelectTrigger className="w-64">
                     <SelectValue placeholder="Seleccione un tópico" />
@@ -183,7 +183,6 @@ export const Dashboard = ({ user, onSelectApp, onLogout }: DashboardProps) => {
                     ))}
                   </SelectContent>
                 </Select>
-                </h4>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
