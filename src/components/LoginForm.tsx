@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -68,9 +67,11 @@ export const LoginForm = ({ onLogin }: LoginFormProps) => {
       <div className="w-full max-w-md space-y-6">
         <div className="text-center space-y-4">
           <div className="flex justify-center">
-            <div className="w-16 h-16 bg-blue-600 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-xl">SBS</span>
-            </div>
+            <img 
+              src="/lovable-uploads/f9e927dd-5f22-4e7b-b112-eb0e8b96b40b.png" 
+              alt="Logo SBS" 
+              className="w-20 h-20 object-contain"
+            />
           </div>
           <div>
             <h1 className="text-3xl font-bold text-gray-900">Plataforma de Supervisión</h1>

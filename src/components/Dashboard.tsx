@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -62,9 +61,11 @@ export const Dashboard = ({ user, onSelectApp, onLogout }: DashboardProps) => {
               <Menu className="h-5 w-5" />
             </Button>
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center">
-                <span className="text-white font-bold text-sm">SBS</span>
-              </div>
+              <img 
+                src="/lovable-uploads/f9e927dd-5f22-4e7b-b112-eb0e8b96b40b.png" 
+                alt="Logo SBS" 
+                className="w-8 h-8 object-contain"
+              />
               <h1 className="text-xl font-semibold text-gray-900">
                 Plataforma de Supervisión
               </h1>

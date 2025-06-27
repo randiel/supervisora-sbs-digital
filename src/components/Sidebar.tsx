@@ -1,4 +1,3 @@
-
 import { Button } from '@/components/ui/button';
 import { Sheet, SheetContent, SheetHeader, SheetTitle } from '@/components/ui/sheet';
 import { User, Home, Settings, LogOut, Shield } from 'lucide-react';
@@ -24,9 +23,11 @@ export const Sidebar = ({ isOpen, onClose, user, onLogout }: SidebarProps) => {
       <SheetContent side="left" className="w-80">
         <SheetHeader className="pb-6">
           <div className="flex items-center space-x-3">
-            <div className="w-10 h-10 bg-blue-600 rounded-full flex items-center justify-center">
-              <span className="text-white font-bold">SBS</span>
-            </div>
+            <img 
+              src="/lovable-uploads/f9e927dd-5f22-4e7b-b112-eb0e8b96b40b.png" 
+              alt="Logo SBS" 
+              className="w-10 h-10 object-contain"
+            />
             <div>
               <SheetTitle className="text-left">Plataforma de Supervisión</SheetTitle>
               <p className="text-sm text-gray-500">SBS Perú</p>
