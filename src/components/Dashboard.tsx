@@ -86,7 +86,7 @@ export const Dashboard = ({ user, onSelectApp, onLogout }: DashboardProps) => {
           <CardHeader className="pb-4">
             <div className="flex items-center space-x-3 mb-2">
               <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <IconComponent className="h-5 w-5 text-blue-600" />
+                <IconComponent className="h-5 w-5 text-blue-900" />
               </div>
               <Badge variant="secondary" className="text-xs">
                 SBS
@@ -100,7 +100,7 @@ export const Dashboard = ({ user, onSelectApp, onLogout }: DashboardProps) => {
             <p className="text-gray-600 text-sm mb-4">
               {app.description}
             </p>
-            <Button className="w-full bg-blue-600 hover:bg-blue-700">
+            <Button className="w-full bg-blue-900 hover:bg-blue-800">
               Acceder
             </Button>
           </CardContent>
