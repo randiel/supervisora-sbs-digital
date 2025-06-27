@@ -27,7 +27,7 @@ const applications: Application[] = [
   {
     id: 'cartas-fianza',
     name: 'Cartas Fianza',
-    description: 'Supervisión y control de cartas fianza emitidas'
+    description: 'Supervisión y control de cartas fianza emitidas en el sistema financiero'
   }
 ];
 
