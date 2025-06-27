@@ -135,12 +135,15 @@ export const Dashboard = ({ user, onSelectApp, onLogout }: DashboardProps) => {
             </p>
           </div>
 
-          <div className="space-y-8">
+          <div className="space-y-10">
             {/* Análisis Transversal */}
             <div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
                 Análisis Transversal
               </h3>
+              <p className="text-gray-600 mb-4">
+                Estás aplicaciones permiten realizar análisis entre múltiples documentos y fuentes de información
+              </p>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {renderApplications(transversalApplications)}
               </div>
@@ -148,9 +151,12 @@ export const Dashboard = ({ user, onSelectApp, onLogout }: DashboardProps) => {
 
             {/* Análisis Especializado */}
             <div>
-              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+              <h3 className="text-xl font-semibold text-gray-900 mb-2">
                 Análisis Especializado
               </h3>
+              <p className="text-gray-600 mb-4">
+                Estás aplicaciones están enfocadas a ciertos productos del sistema financiero y permiten realizar análisis cruzados
+              </p>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {renderApplications(specializedApplications)}
               </div>
