@@ -16,17 +16,17 @@ interface DashboardProps {
 const applications: Application[] = [
   {
     id: 'busqueda-documental',
-    name: 'Aplicación de Búsqueda Documental',
+    name: 'Búsqueda Documental',
     description: 'Sistema de gestión y búsqueda de documentos regulatorios'
   },
   {
     id: 'garantias-preferidas',
-    name: 'Aplicación de Garantías Preferidas',
+    name: 'Garantías Preferidas',
     description: 'Gestión y análisis de garantías preferidas del sistema financiero'
   },
   {
     id: 'cartas-fianza',
-    name: 'Aplicación de Cartas Fianza',
+    name: 'Cartas Fianza',
     description: 'Supervisión y control de cartas fianza emitidas'
   }
 ];

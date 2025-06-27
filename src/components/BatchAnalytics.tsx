@@ -103,7 +103,7 @@ export const BatchAnalytics = ({ entity, onBack, onGoToAgent }: BatchAnalyticsPr
         </Button>
         
         <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          Aplicación de Analítica Batch
+          Analítica Batch
         </h2>
         <p className="text-gray-600">
           {entity.name} - {entity.license}

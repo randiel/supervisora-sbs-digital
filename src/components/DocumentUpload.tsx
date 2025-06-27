@@ -229,7 +229,7 @@ export const DocumentUpload = ({ entity, onBack, onFilesUploaded }: DocumentUplo
         </Button>
         
         <h2 className="text-2xl font-bold text-gray-900 mb-2">
-          Aplicación de Carga Documental
+          Carga Documental
         </h2>
         <p className="text-gray-600">
           {entity.name} - {entity.license}
