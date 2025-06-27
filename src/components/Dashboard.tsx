@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -86,7 +85,7 @@ export const Dashboard = ({ user, onSelectApp, onLogout }: DashboardProps) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gray-50 flex flex-col">
       {/* Header */}
       <header className="bg-white shadow-sm border-b border-gray-200">
         <div className="flex items-center justify-between h-16 px-6">
@@ -124,7 +123,7 @@ export const Dashboard = ({ user, onSelectApp, onLogout }: DashboardProps) => {
       </header>
 
       {/* Main Content */}
-      <main className="px-6 py-8">
+      <main className="flex-1 px-6 py-8">
         <div className="max-w-7xl mx-auto">
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
@@ -164,6 +163,15 @@ export const Dashboard = ({ user, onSelectApp, onLogout }: DashboardProps) => {
           </div>
         </div>
       </main>
+
+      {/* Footer */}
+      <footer className="bg-white border-t border-gray-200 py-4">
+        <div className="max-w-7xl mx-auto px-6">
+          <p className="text-center text-sm text-gray-600">
+            © 2025 Superintendencia de Banca, Seguros y AFP. Todos los derechos reservados.
+          </p>
+        </div>
+      </footer>
 
       <Sidebar 
         isOpen={sidebarOpen}
