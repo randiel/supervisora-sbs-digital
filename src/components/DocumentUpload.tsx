@@ -1,13 +1,14 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowLeft, Upload, Plus, FileText, X, Eye } from 'lucide-react';
 import { FinancialEntity } from './ApplicationWindow';
+import { Application } from '@/pages/Index';
 import { toast } from '@/hooks/use-toast';
 
 interface DocumentUploadProps {
   entity: FinancialEntity;
+  application: Application;
   onBack: () => void;
   onFilesUploaded: () => void;
 }
@@ -27,14 +28,31 @@ interface UploadedFile {
   uploadDate: Date;
 }
 
-const defaultDatasets: Dataset[] = [
-  { id: 'informes-tecnicos', name: 'Informes Técnicos SBS', files: [] },
-  { id: 'informes-auditoria', name: 'Informes de Auditoría', files: [] },
-  { id: 'informes-seguimiento', name: 'Informes de Seguimiento y Recomendaciones', files: [] }
-];
+const getDefaultDatasets = (applicationId: string): Dataset[] => {
+  switch (applicationId) {
+    case 'garantias-preferidas':
+      return [
+        { id: 'tasaciones', name: 'Tasaciones', files: [] },
+        { id: 'polizas', name: 'Pólizas', files: [] },
+        { id: 'inscripciones', name: 'Inscripciones', files: [] }
+      ];
+    case 'busqueda-documental':
+      return [
+        { id: 'informes-tecnicos', name: 'Informes Técnicos SBS', files: [] },
+        { id: 'informes-auditoria', name: 'Informes de Auditoría', files: [] },
+        { id: 'informes-seguimiento', name: 'Informes de Seguimiento y Recomendaciones', files: [] }
+      ];
+    default:
+      return [
+        { id: 'informes-tecnicos', name: 'Informes Técnicos SBS', files: [] },
+        { id: 'informes-auditoria', name: 'Informes de Auditoría', files: [] },
+        { id: 'informes-seguimiento', name: 'Informes de Seguimiento y Recomendaciones', files: [] }
+      ];
+  }
+};
 
-export const DocumentUpload = ({ entity, onBack, onFilesUploaded }: DocumentUploadProps) => {
-  const [datasets, setDatasets] = useState<Dataset[]>(defaultDatasets);
+export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }: DocumentUploadProps) => {
+  const [datasets, setDatasets] = useState<Dataset[]>(() => getDefaultDatasets(application.id));
   const [selectedDataset, setSelectedDataset] = useState<string | null>(null);
   const [previewFile, setPreviewFile] = useState<UploadedFile | null>(null);
   const [newDatasetName, setNewDatasetName] = useState('');
@@ -102,8 +120,8 @@ export const DocumentUpload = ({ entity, onBack, onFilesUploaded }: DocumentUplo
     setShowNewDatasetForm(false);
     
     toast({
-      title: "Dataset creado",
-      description: `Se ha creado el dataset: ${newDatasetName}`
+      title: "Carpeta creada",
+      description: `Se ha creado la carpeta: ${newDatasetName}`
     });
   };
 
@@ -125,7 +143,7 @@ export const DocumentUpload = ({ entity, onBack, onFilesUploaded }: DocumentUplo
               className="mb-4"
             >
               <ArrowLeft className="h-4 w-4 mr-2" />
-              Volver a Datasets
+              Volver a Carpetas
             </Button>
             
             <h2 className="text-2xl font-bold text-gray-900 mb-2">

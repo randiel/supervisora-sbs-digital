@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
@@ -56,6 +55,7 @@ export const ApplicationWindow = ({ application, user, onBack }: ApplicationWind
         return (
           <DocumentUpload 
             entity={selectedEntity!}
+            application={application}
             onBack={handleBackToMain}
             onFilesUploaded={() => setHasUploadedFiles(true)}
           />
