@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Menu, User, Search, Shield, FileText } from 'lucide-react';
+import { Menu, User, Search, Shield, FileText, TrendingUp } from 'lucide-react';
 import { User as UserType, Application } from '@/pages/Index';
 import { Sidebar } from './Sidebar';
 
@@ -12,6 +12,10 @@ interface DashboardProps {
   user: UserType;
   onSelectApp: (app: Application) => void;
   onLogout: () => void;
+}
+
+interface SpecializedApplication extends Application {
+  topic: string;
 }
 
 const transversalApplications: Application[] = [
@@ -22,16 +26,24 @@ const transversalApplications: Application[] = [
   }
 ];
 
-const specializedApplications: Application[] = [
+const specializedApplications: SpecializedApplication[] = [
   {
     id: 'garantias-preferidas',
     name: 'Evaluación de Garantías Preferidas',
-    description: 'Gestión y análisis de garantías preferidas del sistema financiero'
+    description: 'Gestión y análisis de garantías preferidas del sistema financiero',
+    topic: 'Confiabilidad de datos'
   },
   {
     id: 'cartas-fianza',
     name: 'Evaluación de Cartas Fianza',
-    description: 'Supervisión y control de cartas fianza emitidas en el sistema financiero'
+    description: 'Supervisión y control de cartas fianza emitidas en el sistema financiero',
+    topic: 'Confiabilidad de datos'
+  },
+  {
+    id: 'contratos-deuda-subordinada',
+    name: 'Evaluación de Contratos de Deuda Subordinada',
+    description: 'Análisis y supervisión de contratos de deuda subordinada en el sistema financiero',
+    topic: 'Supervisión de gestión de riesgos de mercado'
   }
 ];
 
@@ -55,6 +67,8 @@ export const Dashboard = ({ user, onSelectApp, onLogout }: DashboardProps) => {
         return Shield;
       case 'cartas-fianza':
         return FileText;
+      case 'contratos-deuda-subordinada':
+        return TrendingUp;
       default:
         return FileText;
     }
@@ -94,6 +108,10 @@ export const Dashboard = ({ user, onSelectApp, onLogout }: DashboardProps) => {
       );
     });
   };
+
+  const filteredSpecializedApplications = selectedTopic === 'Todos los tópicos' 
+    ? specializedApplications 
+    : specializedApplications.filter(app => app.topic === selectedTopic);
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -170,23 +188,25 @@ export const Dashboard = ({ user, onSelectApp, onLogout }: DashboardProps) => {
               
               {/* Filtro de Tópicos */}
               <div className="mb-6">
-                <h4 className="text-sm font-medium text-gray-700 mb-3">Filtrar por tópico:</h4>
-                <Select value={selectedTopic} onValueChange={setSelectedTopic}>
-                  <SelectTrigger className="w-64">
-                    <SelectValue placeholder="Seleccione un tópico" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {topicFilters.map((topic) => (
-                      <SelectItem key={topic} value={topic}>
-                        {topic}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+                <div className="flex items-center space-x-4">
+                  <h4 className="text-sm font-medium text-gray-700">Filtrar por tópico:</h4>
+                  <Select value={selectedTopic} onValueChange={setSelectedTopic}>
+                    <SelectTrigger className="w-64">
+                      <SelectValue placeholder="Seleccione un tópico" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {topicFilters.map((topic) => (
+                        <SelectItem key={topic} value={topic}>
+                          {topic}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {renderApplications(specializedApplications)}
+                {renderApplications(filteredSpecializedApplications)}
               </div>
             </div>
           </div>
