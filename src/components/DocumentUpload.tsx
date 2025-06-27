@@ -266,10 +266,10 @@ export const DocumentUpload = ({ entity, onBack, onFilesUploaded }: DocumentUplo
               <Plus className="h-8 w-8 text-gray-400" />
             </div>
             <h3 className="font-semibold text-gray-600 mb-2">
-              Agregar Dataset
+              Agregar Carpeta
             </h3>
             <p className="text-sm text-gray-400">
-              Crear nuevo dataset
+              Crear nueva carpeta
             </p>
           </CardContent>
         </Card>
@@ -278,10 +278,10 @@ export const DocumentUpload = ({ entity, onBack, onFilesUploaded }: DocumentUplo
       {showNewDatasetForm && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
           <div className="bg-white rounded-lg p-6 w-96">
-            <h3 className="text-lg font-semibold mb-4">Nuevo Dataset</h3>
+            <h3 className="text-lg font-semibold mb-4">Nueva Carpeta</h3>
             <input
               type="text"
-              placeholder="Nombre del dataset"
+              placeholder="Nombre de la carpeta"
               value={newDatasetName}
               onChange={(e) => setNewDatasetName(e.target.value)}
               className="w-full p-2 border rounded mb-4"
