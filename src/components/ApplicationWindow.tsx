@@ -1,3 +1,4 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
@@ -49,6 +50,65 @@ export const ApplicationWindow = ({ application, user, onBack }: ApplicationWind
     setActiveSection('main');
   };
 
+  const renderMainContent = () => (
+    <div className="flex h-full">
+      <div className="flex-1 p-6">
+        <div className="text-center py-12">
+          <h3 className="text-xl font-semibold text-gray-900 mb-4">
+            Seleccione una entidad del sistema financiero
+          </h3>
+          <p className="text-gray-600">
+            Elija una entidad del árbol para comenzar el proceso de supervisión
+          </p>
+        </div>
+      </div>
+      
+      <div className="w-80 border-l bg-gray-50 p-4">
+        <FinancialSystemTree onEntitySelect={handleEntitySelect} />
+        
+        {selectedEntity && (
+          <div className="mt-6 space-y-3">
+            <div className="bg-white p-3 rounded-lg border">
+              <div className="text-sm font-medium text-gray-900">
+                {selectedEntity.name}
+              </div>
+              <div className="text-xs text-gray-500">
+                {selectedEntity.license}
+              </div>
+            </div>
+            
+            <div className="space-y-2">
+              <Button
+                onClick={handleDocumentUpload}
+                className="w-full bg-blue-900 hover:bg-blue-800"
+              >
+                Carga Documental
+              </Button>
+              
+              <Button
+                onClick={handleBatchAnalytics}
+                disabled={!hasUploadedFiles}
+                variant={hasUploadedFiles ? "default" : "secondary"}
+                className="w-full"
+              >
+                Analítica Batch
+              </Button>
+              
+              <Button
+                onClick={handleSupervisorAgent}
+                disabled={!hasUploadedFiles}
+                variant={hasUploadedFiles ? "default" : "secondary"}
+                className="w-full"
+              >
+                Agente Suptech
+              </Button>
+            </div>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+
   const renderContent = () => {
     switch (activeSection) {
       case 'upload':
@@ -76,64 +136,7 @@ export const ApplicationWindow = ({ application, user, onBack }: ApplicationWind
           />
         );
       default:
-        return (
-          <div className="flex h-full">
-            <div className="flex-1 p-6">
-              <div className="text-center py-12">
-                <h3 className="text-xl font-semibold text-gray-900 mb-4">
-                  Seleccione una entidad del sistema financiero
-                </h3>
-                <p className="text-gray-600">
-                  Elija una entidad del árbol para comenzar el proceso de supervisión
-                </p>
-              </div>
-            </div>
-            
-            <div className="w-80 border-l bg-gray-50 p-4">
-              <FinancialSystemTree onEntitySelect={handleEntitySelect} />
-              
-              {selectedEntity && (
-                <div className="mt-6 space-y-3">
-                  <div className="bg-white p-3 rounded-lg border">
-                    <div className="text-sm font-medium text-gray-900">
-                      {selectedEntity.name}
-                    </div>
-                    <div className="text-xs text-gray-500">
-                      {selectedEntity.license}
-                    </div>
-                  </div>
-                  
-                  <div className="space-y-2">
-                    <Button
-                      onClick={handleDocumentUpload}
-                      className="w-full bg-blue-900 hover:bg-blue-800"
-                    >
-                      Carga Documental
-                    </Button>
-                    
-                    <Button
-                      onClick={handleBatchAnalytics}
-                      disabled={!hasUploadedFiles}
-                      variant={hasUploadedFiles ? "default" : "secondary"}
-                      className="w-full"
-                    >
-                      Analítica Batch
-                    </Button>
-                    
-                    <Button
-                      onClick={handleSupervisorAgent}
-                      disabled={!hasUploadedFiles}
-                      variant={hasUploadedFiles ? "default" : "secondary"}
-                      className="w-full"
-                    >
-                      Agente Suptech
-                    </Button>
-                  </div>
-                </div>
-              )}
-            </div>
-          </div>
-        );
+        return renderMainContent();
     }
   };
 

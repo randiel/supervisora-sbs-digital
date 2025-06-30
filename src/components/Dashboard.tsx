@@ -18,7 +18,7 @@ interface SpecializedApplication extends Application {
   topic: string;
 }
 
-const transversalApplications: Application[] = [
+const TRANSVERSAL_APPLICATIONS: Application[] = [
   {
     id: 'busqueda-documental',
     name: 'Búsqueda Documental',
@@ -26,7 +26,7 @@ const transversalApplications: Application[] = [
   }
 ];
 
-const specializedApplications: SpecializedApplication[] = [
+const SPECIALIZED_APPLICATIONS: SpecializedApplication[] = [
   {
     id: 'garantias-preferidas',
     name: 'Evaluación de Garantías Preferidas',
@@ -47,7 +47,7 @@ const specializedApplications: SpecializedApplication[] = [
   }
 ];
 
-const topicFilters = [
+const TOPIC_FILTERS = [
   'Todos los tópicos',
   'Confiabilidad de datos',
   'Supervisión de gestión de riesgos de mercado',
@@ -55,63 +55,59 @@ const topicFilters = [
   'Supervisión de riesgos de conglomerados'
 ];
 
+// Mapeo de iconos por aplicación
+const APP_ICONS = {
+  'busqueda-documental': Search,
+  'garantias-preferidas': Shield,
+  'cartas-fianza': FileText,
+  'contratos-deuda-subordinada': TrendingUp
+} as const;
+
 export const Dashboard = ({ user, onSelectApp, onLogout }: DashboardProps) => {
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [selectedTopic, setSelectedTopic] = useState<string>('Todos los tópicos');
 
   const getAppIcon = (appId: string) => {
-    switch (appId) {
-      case 'busqueda-documental':
-        return Search;
-      case 'garantias-preferidas':
-        return Shield;
-      case 'cartas-fianza':
-        return FileText;
-      case 'contratos-deuda-subordinada':
-        return TrendingUp;
-      default:
-        return FileText;
-    }
+    return APP_ICONS[appId as keyof typeof APP_ICONS] || FileText;
   };
 
-  const renderApplications = (applications: Application[]) => {
-    return applications.map((app) => {
-      const IconComponent = getAppIcon(app.id);
-      return (
-        <Card 
-          key={app.id} 
-          className="hover:shadow-lg transition-all duration-200 cursor-pointer border-0 shadow-md"
-          onClick={() => onSelectApp(app)}
-        >
-          <CardHeader className="pb-4">
-            <div className="flex items-center space-x-3 mb-2">
-              <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                <IconComponent className="h-5 w-5 text-blue-900" />
-              </div>
-              <Badge variant="secondary" className="text-xs">
-                SBS
-              </Badge>
+  const renderApplicationCard = (app: Application) => {
+    const IconComponent = getAppIcon(app.id);
+    
+    return (
+      <Card 
+        key={app.id} 
+        className="hover:shadow-lg transition-all duration-200 cursor-pointer border-0 shadow-md"
+        onClick={() => onSelectApp(app)}
+      >
+        <CardHeader className="pb-4">
+          <div className="flex items-center space-x-3 mb-2">
+            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
+              <IconComponent className="h-5 w-5 text-blue-900" />
             </div>
-            <CardTitle className="text-lg leading-tight">
-              {app.name}
-            </CardTitle>
-          </CardHeader>
-          <CardContent>
-            <p className="text-gray-600 text-sm mb-4">
-              {app.description}
-            </p>
-            <Button className="w-full bg-blue-900 hover:bg-blue-800">
-              Acceder
-            </Button>
-          </CardContent>
-        </Card>
-      );
-    });
+            <Badge variant="secondary" className="text-xs">
+              SBS
+            </Badge>
+          </div>
+          <CardTitle className="text-lg leading-tight">
+            {app.name}
+          </CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-gray-600 text-sm mb-4">
+            {app.description}
+          </p>
+          <Button className="w-full bg-blue-900 hover:bg-blue-800">
+            Acceder
+          </Button>
+        </CardContent>
+      </Card>
+    );
   };
 
   const filteredSpecializedApplications = selectedTopic === 'Todos los tópicos' 
-    ? specializedApplications 
-    : specializedApplications.filter(app => app.topic === selectedTopic);
+    ? SPECIALIZED_APPLICATIONS 
+    : SPECIALIZED_APPLICATIONS.filter(app => app.topic === selectedTopic);
 
   return (
     <div className="min-h-screen bg-gray-50 flex flex-col">
@@ -158,6 +154,7 @@ export const Dashboard = ({ user, onSelectApp, onLogout }: DashboardProps) => {
       {/* Main Content */}
       <main className="flex-1 px-6 py-8">
         <div className="max-w-7xl mx-auto">
+          {/* Welcome Section */}
           <div className="mb-8">
             <h2 className="text-2xl font-bold text-gray-900 mb-2">
               Bienvenido, {user.name}
@@ -169,25 +166,25 @@ export const Dashboard = ({ user, onSelectApp, onLogout }: DashboardProps) => {
 
           <div className="space-y-10">
             {/* Análisis Transversal */}
-            <div>
+            <section>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
                 Análisis Transversal
               </h3>
               <p className="text-gray-600 mb-4">
-                Estás aplicaciones permiten realizar análisis entre múltiples documentos y fuentes de información
+                Estas aplicaciones permiten realizar análisis entre múltiples documentos y fuentes de información
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {renderApplications(transversalApplications)}
+                {TRANSVERSAL_APPLICATIONS.map(renderApplicationCard)}
               </div>
-            </div>
+            </section>
 
             {/* Análisis Especializado */}
-            <div>
+            <section>
               <h3 className="text-xl font-semibold text-gray-900 mb-2">
                 Análisis Especializado
               </h3>
               <p className="text-gray-600 mb-4">
-                Estás aplicaciones están enfocadas a ciertos productos del sistema financiero y permiten realizar análisis cruzados
+                Estas aplicaciones están enfocadas a ciertos productos del sistema financiero y permiten realizar análisis cruzados
               </p>
               
               {/* Filtro de Tópicos */}
@@ -199,7 +196,7 @@ export const Dashboard = ({ user, onSelectApp, onLogout }: DashboardProps) => {
                       <SelectValue placeholder="Seleccione un tópico" />
                     </SelectTrigger>
                     <SelectContent>
-                      {topicFilters.map((topic) => (
+                      {TOPIC_FILTERS.map((topic) => (
                         <SelectItem key={topic} value={topic}>
                           {topic}
                         </SelectItem>
@@ -210,9 +207,9 @@ export const Dashboard = ({ user, onSelectApp, onLogout }: DashboardProps) => {
               </div>
 
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {renderApplications(filteredSpecializedApplications)}
+                {filteredSpecializedApplications.map(renderApplicationCard)}
               </div>
-            </div>
+            </section>
           </div>
         </div>
       </main>

@@ -11,10 +11,26 @@ interface SidebarProps {
   onLogout: () => void;
 }
 
+interface MenuItem {
+  icon: React.ComponentType<{ className?: string }> | (() => JSX.Element);
+  label: string;
+  action: () => void;
+}
+
 export const Sidebar = ({ isOpen, onClose, user, onLogout }: SidebarProps) => {
-  const menuItems = [
+  const menuItems: MenuItem[] = [
     { icon: Home, label: 'Dashboard', action: onClose },
-    { icon: () => <img src="/lovable-uploads/c2d804d2-3ef6-4777-ba96-73e5ab43dc93.png" alt="Usuario" className="h-5 w-5" />, label: 'Perfil', action: () => {} },
+    { 
+      icon: () => (
+        <img 
+          src="/lovable-uploads/c2d804d2-3ef6-4777-ba96-73e5ab43dc93.png" 
+          alt="Usuario" 
+          className="h-5 w-5" 
+        />
+      ), 
+      label: 'Perfil', 
+      action: () => {} 
+    },
     { icon: Settings, label: 'Configuración', action: () => {} },
     { icon: Shield, label: 'Seguridad', action: () => {} },
   ];
@@ -37,6 +53,7 @@ export const Sidebar = ({ isOpen, onClose, user, onLogout }: SidebarProps) => {
         </SheetHeader>
 
         <div className="space-y-6">
+          {/* User Profile Section */}
           <div className="bg-blue-50 rounded-lg p-4">
             <div className="flex items-center space-x-3">
               <div className="w-12 h-12 bg-white rounded-full flex items-center justify-center">
@@ -55,6 +72,7 @@ export const Sidebar = ({ isOpen, onClose, user, onLogout }: SidebarProps) => {
             </div>
           </div>
 
+          {/* Navigation Menu */}
           <nav className="space-y-2">
             {menuItems.map((item) => (
               <Button
@@ -69,6 +87,7 @@ export const Sidebar = ({ isOpen, onClose, user, onLogout }: SidebarProps) => {
             ))}
           </nav>
 
+          {/* Logout Section */}
           <div className="pt-6 border-t">
             <Button
               variant="ghost"

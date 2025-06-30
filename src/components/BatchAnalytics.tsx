@@ -24,17 +24,29 @@ interface AnalysisResult {
   resultado?: string;
 }
 
-const months = [
+const MONTHS = [
   'Enero', 'Febrero', 'Marzo', 'Abril', 'Mayo', 'Junio',
   'Julio', 'Agosto', 'Septiembre', 'Octubre', 'Noviembre', 'Diciembre'
 ];
 
-const years = Array.from({ length: new Date().getFullYear() - 2021 }, (_, i) => 2022 + i);
+const YEARS = Array.from({ length: new Date().getFullYear() - 2021 }, (_, i) => 2022 + i);
+
+const ANALYSIS_DURATION_MIN = 5;
+const ANALYSIS_DURATION_MAX = 20;
+const SIMULATION_DELAY = 3000; // 3 segundos
 
 export const BatchAnalytics = ({ entity, onBack, onGoToAgent }: BatchAnalyticsProps) => {
   const [selectedMonth, setSelectedMonth] = useState<string>('');
   const [selectedYear, setSelectedYear] = useState<string>('');
   const [results, setResults] = useState<AnalysisResult[]>([]);
+
+  const generateResultFileName = (entityName: string, month: string, year: string): string => {
+    return `${entityName.replace(/\s+/g, '_')}_${month}_${year}.zip`;
+  };
+
+  const generateAnalysisDuration = (): number => {
+    return Math.floor(Math.random() * (ANALYSIS_DURATION_MAX - ANALYSIS_DURATION_MIN + 1)) + ANALYSIS_DURATION_MIN;
+  };
 
   const handleExecuteAnalysis = () => {
     if (!selectedMonth || !selectedYear) {
@@ -70,8 +82,8 @@ export const BatchAnalytics = ({ entity, onBack, onGoToAgent }: BatchAnalyticsPr
           ? {
               ...result,
               estado: 'Finalizado' as const,
-              duracion: Math.floor(Math.random() * 15) + 5,
-              resultado: `${entity.name.replace(/\s+/g, '_')}_${selectedMonth}_${selectedYear}.zip`
+              duracion: generateAnalysisDuration(),
+              resultado: generateResultFileName(entity.name, selectedMonth, selectedYear)
             }
           : result
       ));
@@ -80,7 +92,7 @@ export const BatchAnalytics = ({ entity, onBack, onGoToAgent }: BatchAnalyticsPr
         title: "Análisis completado",
         description: "El análisis batch ha finalizado exitosamente"
       });
-    }, 3000);
+    }, SIMULATION_DELAY);
   };
 
   const handleDownloadResult = (fileName: string) => {
@@ -89,6 +101,140 @@ export const BatchAnalytics = ({ entity, onBack, onGoToAgent }: BatchAnalyticsPr
       description: `Descargando ${fileName}`
     });
   };
+
+  const renderAnalysisForm = () => (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-lg">Período de Análisis</CardTitle>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Mes
+          </label>
+          <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+            <SelectTrigger>
+              <SelectValue placeholder="Seleccionar mes" />
+            </SelectTrigger>
+            <SelectContent>
+              {MONTHS.map((month) => (
+                <SelectItem key={month} value={month}>
+                  {month}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div>
+          <label className="block text-sm font-medium text-gray-700 mb-2">
+            Año
+          </label>
+          <Select value={selectedYear} onValueChange={setSelectedYear}>
+            <SelectTrigger>
+              <SelectValue placeholder="Seleccionar año" />
+            </SelectTrigger>
+            <SelectContent>
+              {YEARS.map((year) => (
+                <SelectItem key={year} value={year.toString()}>
+                  {year}
+                </SelectItem>
+              ))}
+            </SelectContent>
+          </Select>
+        </div>
+
+        <div className="pt-4 space-y-2">
+          <Button 
+            onClick={handleExecuteAnalysis}
+            className="w-full bg-blue-600 hover:bg-blue-700"
+            disabled={!selectedMonth || !selectedYear}
+          >
+            <Play className="h-4 w-4 mr-2" />
+            Ejecutar Análisis
+          </Button>
+
+          <Button 
+            onClick={onGoToAgent}
+            variant="outline"
+            className="w-full"
+            disabled={results.length === 0}
+          >
+            Agente Suptech
+          </Button>
+        </div>
+      </CardContent>
+    </Card>
+  );
+
+  const renderResultsTable = () => (
+    <Card>
+      <CardHeader>
+        <CardTitle className="text-lg">Resultados de Análisis</CardTitle>
+      </CardHeader>
+      <CardContent>
+        {results.length === 0 ? (
+          <div className="text-center py-8">
+            <p className="text-gray-500">
+              No hay análisis ejecutados. Ejecute un análisis para ver los resultados.
+            </p>
+          </div>
+        ) : (
+          <div className="overflow-x-auto">
+            <table className="w-full text-sm">
+              <thead>
+                <tr className="border-b bg-gray-50">
+                  <th className="text-left p-3 font-medium">Supervisado</th>
+                  <th className="text-left p-3 font-medium">Supervisor</th>
+                  <th className="text-left p-3 font-medium">Fecha/Hora</th>
+                  <th className="text-left p-3 font-medium">Duración</th>
+                  <th className="text-left p-3 font-medium">Fecha Corte</th>
+                  <th className="text-left p-3 font-medium">Estado</th>
+                  <th className="text-left p-3 font-medium">Resultado</th>
+                </tr>
+              </thead>
+              <tbody>
+                {results.map((result) => (
+                  <tr key={result.id} className="border-b hover:bg-gray-50">
+                    <td className="p-3">{result.supervisado}</td>
+                    <td className="p-3">{result.supervisor}</td>
+                    <td className="p-3">
+                      {result.fechaLanzamiento.toLocaleString()}
+                    </td>
+                    <td className="p-3">
+                      {result.duracion > 0 ? `${result.duracion} min` : '-'}
+                    </td>
+                    <td className="p-3">{result.fechaCorte}</td>
+                    <td className="p-3">
+                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
+                        result.estado === 'Finalizado' 
+                          ? 'bg-green-100 text-green-800' 
+                          : 'bg-yellow-100 text-yellow-800'
+                      }`}>
+                        {result.estado}
+                      </span>
+                    </td>
+                    <td className="p-3">
+                      {result.resultado && (
+                        <Button
+                          size="sm"
+                          variant="outline"
+                          onClick={() => handleDownloadResult(result.resultado!)}
+                        >
+                          <Download className="h-3 w-3 mr-1" />
+                          {result.resultado}
+                        </Button>
+                      )}
+                    </td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        )}
+      </CardContent>
+    </Card>
+  );
 
   return (
     <div className="p-6">
@@ -112,137 +258,10 @@ export const BatchAnalytics = ({ entity, onBack, onGoToAgent }: BatchAnalyticsPr
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         <div className="lg:col-span-1">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Período de Análisis</CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4">
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Mes
-                </label>
-                <Select value={selectedMonth} onValueChange={setSelectedMonth}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar mes" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {months.map((month) => (
-                      <SelectItem key={month} value={month}>
-                        {month}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
-                  Año
-                </label>
-                <Select value={selectedYear} onValueChange={setSelectedYear}>
-                  <SelectTrigger>
-                    <SelectValue placeholder="Seleccionar año" />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {years.map((year) => (
-                      <SelectItem key={year} value={year.toString()}>
-                        {year}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <div className="pt-4 space-y-2">
-                <Button 
-                  onClick={handleExecuteAnalysis}
-                  className="w-full bg-blue-600 hover:bg-blue-700"
-                  disabled={!selectedMonth || !selectedYear}
-                >
-                  <Play className="h-4 w-4 mr-2" />
-                  Ejecutar Análisis
-                </Button>
-
-                <Button 
-                  onClick={onGoToAgent}
-                  variant="outline"
-                  className="w-full"
-                  disabled={results.length === 0}
-                >
-                  Agente Suptech
-                </Button>
-              </div>
-            </CardContent>
-          </Card>
+          {renderAnalysisForm()}
         </div>
-
         <div className="lg:col-span-2">
-          <Card>
-            <CardHeader>
-              <CardTitle className="text-lg">Resultados de Análisis</CardTitle>
-            </CardHeader>
-            <CardContent>
-              {results.length === 0 ? (
-                <div className="text-center py-8">
-                  <p className="text-gray-500">
-                    No hay análisis ejecutados. Ejecute un análisis para ver los resultados.
-                  </p>
-                </div>
-              ) : (
-                <div className="overflow-x-auto">
-                  <table className="w-full text-sm">
-                    <thead>
-                      <tr className="border-b bg-gray-50">
-                        <th className="text-left p-3 font-medium">Supervisado</th>
-                        <th className="text-left p-3 font-medium">Supervisor</th>
-                        <th className="text-left p-3 font-medium">Fecha/Hora</th>
-                        <th className="text-left p-3 font-medium">Duración</th>
-                        <th className="text-left p-3 font-medium">Fecha Corte</th>
-                        <th className="text-left p-3 font-medium">Estado</th>
-                        <th className="text-left p-3 font-medium">Resultado</th>
-                      </tr>
-                    </thead>
-                    <tbody>
-                      {results.map((result) => (
-                        <tr key={result.id} className="border-b hover:bg-gray-50">
-                          <td className="p-3">{result.supervisado}</td>
-                          <td className="p-3">{result.supervisor}</td>
-                          <td className="p-3">
-                            {result.fechaLanzamiento.toLocaleString()}
-                          </td>
-                          <td className="p-3">
-                            {result.duracion > 0 ? `${result.duracion} min` : '-'}
-                          </td>
-                          <td className="p-3">{result.fechaCorte}</td>
-                          <td className="p-3">
-                            <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                              result.estado === 'Finalizado' 
-                                ? 'bg-green-100 text-green-800' 
-                                : 'bg-yellow-100 text-yellow-800'
-                            }`}>
-                              {result.estado}
-                            </span>
-                          </td>
-                          <td className="p-3">
-                            {result.resultado && (
-                              <Button
-                                size="sm"
-                                variant="outline"
-                                onClick={() => handleDownloadResult(result.resultado!)}
-                              >
-                                <Download className="h-3 w-3 mr-1" />
-                                {result.resultado}
-                              </Button>
-                            )}
-                          </td>
-                        </tr>
-                      ))}
-                    </tbody>
-                  </table>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+          {renderResultsTable()}
         </div>
       </div>
     </div>
