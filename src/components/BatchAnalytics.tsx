@@ -6,6 +6,8 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ArrowLeft, Play, Download } from 'lucide-react';
 import { FinancialEntity } from './ApplicationWindow';
 import { toast } from '@/hooks/use-toast';
+import { AdditionalParametersModal, AdditionalParameters } from './AdditionalParametersModal';
+import { Timer } from './Timer';
 
 interface BatchAnalyticsProps {
   entity: FinancialEntity;
@@ -22,6 +24,7 @@ interface AnalysisResult {
   fechaCorte: string;
   estado: 'En Ejecución' | 'Finalizado';
   resultado?: string;
+  targetDuration?: number;
 }
 
 const MONTHS = [
@@ -33,12 +36,12 @@ const YEARS = Array.from({ length: new Date().getFullYear() - 2021 }, (_, i) => 
 
 const ANALYSIS_DURATION_MIN = 5;
 const ANALYSIS_DURATION_MAX = 20;
-const SIMULATION_DELAY = 3000; // 3 segundos
 
 export const BatchAnalytics = ({ entity, onBack, onGoToAgent }: BatchAnalyticsProps) => {
   const [selectedMonth, setSelectedMonth] = useState<string>('');
   const [selectedYear, setSelectedYear] = useState<string>('');
   const [results, setResults] = useState<AnalysisResult[]>([]);
+  const [showParametersModal, setShowParametersModal] = useState(false);
 
   const generateResultFileName = (entityName: string, month: string, year: string): string => {
     return `${entityName.replace(/\s+/g, '_')}_${month}_${year}.zip`;
@@ -57,7 +60,12 @@ export const BatchAnalytics = ({ entity, onBack, onGoToAgent }: BatchAnalyticsPr
       });
       return;
     }
+    setShowParametersModal(true);
+  };
 
+  const handleParametersConfirm = (parameters: AdditionalParameters) => {
+    const targetDuration = generateAnalysisDuration();
+    
     const newResult: AnalysisResult = {
       id: Math.random().toString(36).substr(2, 9),
       supervisado: entity.name,
@@ -65,7 +73,8 @@ export const BatchAnalytics = ({ entity, onBack, onGoToAgent }: BatchAnalyticsPr
       fechaLanzamiento: new Date(),
       duracion: 0,
       fechaCorte: `${selectedMonth}-${selectedYear}`,
-      estado: 'En Ejecución'
+      estado: 'En Ejecución',
+      targetDuration
     };
 
     setResults(prev => [newResult, ...prev]);
@@ -74,25 +83,24 @@ export const BatchAnalytics = ({ entity, onBack, onGoToAgent }: BatchAnalyticsPr
       title: "Análisis iniciado",
       description: `Se ha iniciado el análisis batch para ${entity.name}`
     });
+  };
 
-    // Simular finalización del análisis
-    setTimeout(() => {
-      setResults(prev => prev.map(result => 
-        result.id === newResult.id 
-          ? {
-              ...result,
-              estado: 'Finalizado' as const,
-              duracion: generateAnalysisDuration(),
-              resultado: generateResultFileName(entity.name, selectedMonth, selectedYear)
-            }
-          : result
-      ));
+  const handleTimerComplete = (resultId: string) => {
+    setResults(prev => prev.map(result => 
+      result.id === resultId 
+        ? {
+            ...result,
+            estado: 'Finalizado' as const,
+            duracion: result.targetDuration || 0,
+            resultado: generateResultFileName(entity.name, selectedMonth, selectedYear)
+          }
+        : result
+    ));
 
-      toast({
-        title: "Análisis completado",
-        description: "El análisis batch ha finalizado exitosamente"
-      });
-    }, SIMULATION_DELAY);
+    toast({
+      title: "Análisis completado",
+      description: "El análisis batch ha finalizado exitosamente"
+    });
   };
 
   const handleDownloadResult = (fileName: string) => {
@@ -206,13 +214,16 @@ export const BatchAnalytics = ({ entity, onBack, onGoToAgent }: BatchAnalyticsPr
                     </td>
                     <td className="p-3">{result.fechaCorte}</td>
                     <td className="p-3">
-                      <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                        result.estado === 'Finalizado' 
-                          ? 'bg-green-100 text-green-800' 
-                          : 'bg-yellow-100 text-yellow-800'
-                      }`}>
-                        {result.estado}
-                      </span>
+                      {result.estado === 'En Ejecución' ? (
+                        <Timer 
+                          targetDuration={result.targetDuration || 5}
+                          onComplete={() => handleTimerComplete(result.id)}
+                        />
+                      ) : (
+                        <span className="px-2 py-1 rounded-full text-xs font-medium bg-green-100 text-green-800">
+                          {result.estado}
+                        </span>
+                      )}
                     </td>
                     <td className="p-3">
                       {result.resultado && (
@@ -264,6 +275,12 @@ export const BatchAnalytics = ({ entity, onBack, onGoToAgent }: BatchAnalyticsPr
           {renderResultsTable()}
         </div>
       </div>
+
+      <AdditionalParametersModal
+        isOpen={showParametersModal}
+        onClose={() => setShowParametersModal(false)}
+        onConfirm={handleParametersConfirm}
+      />
     </div>
   );
 };

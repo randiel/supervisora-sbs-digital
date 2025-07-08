@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Menu, Search, Shield, FileText, TrendingUp } from 'lucide-react';
+import { Menu, Search, Shield, FileText, TrendingUp, Filter } from 'lucide-react';
 import { User as UserType, Application } from '@/pages/Index';
 import { Sidebar } from './Sidebar';
 
@@ -77,27 +77,27 @@ export const Dashboard = ({ user, onSelectApp, onLogout }: DashboardProps) => {
     return (
       <Card 
         key={app.id} 
-        className="hover:shadow-lg transition-all duration-200 cursor-pointer border-0 shadow-md"
+        className="group hover:shadow-xl transition-all duration-300 cursor-pointer border border-gray-200 hover:border-primary/20 bg-white"
         onClick={() => onSelectApp(app)}
       >
-        <CardHeader className="pb-4">
-          <div className="flex items-center space-x-3 mb-2">
-            <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
-              <IconComponent className="h-5 w-5 text-primary" />
+        <CardHeader className="pb-3">
+          <div className="flex items-start justify-between mb-3">
+            <div className="w-12 h-12 bg-primary/5 rounded-xl flex items-center justify-center group-hover:bg-primary/10 transition-colors">
+              <IconComponent className="h-6 w-6 text-primary" />
             </div>
-            <Badge variant="secondary" className="text-xs">
+            <Badge variant="secondary" className="text-xs font-medium bg-accent/10 text-accent-foreground">
               SBS
             </Badge>
           </div>
-          <CardTitle className="text-lg leading-tight">
+          <CardTitle className="text-lg leading-tight text-gray-900 group-hover:text-primary transition-colors">
             {app.name}
           </CardTitle>
         </CardHeader>
-        <CardContent>
-          <p className="text-gray-600 text-sm mb-4">
+        <CardContent className="pt-0">
+          <p className="text-gray-600 text-sm mb-6 line-clamp-3">
             {app.description}
           </p>
-          <Button className="w-full bg-accent hover:bg-accent/90">
+          <Button className="w-full bg-accent hover:bg-accent/90 text-accent-foreground shadow-sm">
             Acceder
           </Button>
         </CardContent>
@@ -110,25 +110,27 @@ export const Dashboard = ({ user, onSelectApp, onLogout }: DashboardProps) => {
     : SPECIALIZED_APPLICATIONS.filter(app => app.topic === selectedTopic);
 
   return (
-    <div className="min-h-screen bg-gray-50 flex flex-col">
+    <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100/50">
       {/* Header */}
-      <header className="bg-white shadow-sm border-b border-gray-200">
+      <header className="bg-white/95 backdrop-blur-sm shadow-sm border-b border-gray-200/60 sticky top-0 z-40">
         <div className="flex items-center justify-between h-16 px-6">
           <div className="flex items-center space-x-4">
             <Button
               variant="ghost"
               size="sm"
               onClick={() => setSidebarOpen(true)}
-              className="p-2"
+              className="p-2 hover:bg-gray-100"
             >
               <Menu className="h-5 w-5" />
             </Button>
             <div className="flex items-center space-x-3">
-              <img 
-                src="/lovable-uploads/f9e927dd-5f22-4e7b-b112-eb0e8b96b40b.png" 
-                alt="Logo SBS" 
-                className="w-8 h-8 object-contain"
-              />
+              <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center">
+                <img 
+                  src="/lovable-uploads/f9e927dd-5f22-4e7b-b112-eb0e8b96b40b.png" 
+                  alt="Logo SBS" 
+                  className="w-6 h-6 object-contain filter brightness-0 invert"
+                />
+              </div>
               <h1 className="text-xl font-semibold text-gray-900">
                 Asistente de Supervisión
               </h1>
@@ -136,7 +138,7 @@ export const Dashboard = ({ user, onSelectApp, onLogout }: DashboardProps) => {
           </div>
           
           <div className="flex items-center space-x-4">
-            <div className="flex items-center space-x-2">
+            <div className="flex items-center space-x-3 bg-gray-50 rounded-lg px-3 py-2">
               <img 
                 src="/lovable-uploads/c2d804d2-3ef6-4777-ba96-73e5ab43dc93.png" 
                 alt="Usuario" 
@@ -144,7 +146,7 @@ export const Dashboard = ({ user, onSelectApp, onLogout }: DashboardProps) => {
               />
               <div className="text-sm">
                 <div className="font-medium text-gray-900">{user.name}</div>
-                <div className="text-gray-500">{user.role}</div>
+                <div className="text-gray-500 text-xs">{user.role}</div>
               </div>
             </div>
           </div>
@@ -152,61 +154,69 @@ export const Dashboard = ({ user, onSelectApp, onLogout }: DashboardProps) => {
       </header>
 
       {/* Main Content */}
-      <main className="flex-1 px-6 py-8">
+      <main className="px-6 py-8">
         <div className="max-w-7xl mx-auto">
           {/* Welcome Section */}
-          <div className="mb-8">
-            <h2 className="text-2xl font-bold text-gray-900 mb-2">
-              Bienvenido, {user.name}
-            </h2>
-            <p className="text-gray-600">
-              Seleccione una herramienta para comenzar la supervisión
-            </p>
+          <div className="mb-10">
+            <div className="bg-white rounded-2xl p-8 shadow-sm border border-gray-200/50">
+              <h2 className="text-3xl font-bold text-gray-900 mb-3">
+                Bienvenido, {user.name}
+              </h2>
+              <p className="text-gray-600 text-lg">
+                Seleccione una herramienta para comenzar la supervisión
+              </p>
+            </div>
           </div>
 
-          <div className="space-y-10">
+          <div className="space-y-12">
             {/* Análisis Transversal */}
             <section>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                Análisis Transversal
-              </h3>
-              <p className="text-gray-600 mb-4">
-                Estas herramientas permiten realizar análisis entre múltiples documentos y fuentes de información
-              </p>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="mb-6">
+                <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                  Análisis Transversal
+                </h3>
+                <p className="text-gray-600 max-w-3xl">
+                  Estas herramientas permiten realizar análisis entre múltiples documentos y fuentes de información
+                </p>
+              </div>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {TRANSVERSAL_APPLICATIONS.map(renderApplicationCard)}
               </div>
             </section>
 
             {/* Análisis Especializado */}
             <section>
-              <h3 className="text-xl font-semibold text-gray-900 mb-2">
-                Análisis Especializado
-              </h3>
-              <p className="text-gray-600 mb-4">
-                Estas herramientas están enfocadas a ciertos productos del sistema financiero y permiten realizar análisis cruzados
-              </p>
-              
-              {/* Filtro de Tópicos */}
               <div className="mb-6">
-                <div className="flex items-center space-x-4">
-                  <h4 className="text-sm font-medium text-gray-700">Filtrar por tópico:</h4>
-                  <Select value={selectedTopic} onValueChange={setSelectedTopic}>
-                    <SelectTrigger className="w-64">
-                      <SelectValue placeholder="Seleccione un tópico" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      {TOPIC_FILTERS.map((topic) => (
-                        <SelectItem key={topic} value={topic}>
-                          {topic}
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
+                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+                  <div>
+                    <h3 className="text-2xl font-bold text-gray-900 mb-2">
+                      Análisis Especializado
+                    </h3>
+                    <p className="text-gray-600 max-w-3xl">
+                      Estas herramientas están enfocadas a ciertos productos del sistema financiero y permiten realizar análisis cruzados
+                    </p>
+                  </div>
+                  
+                  {/* Filtro de Tópicos */}
+                  <div className="flex items-center space-x-3 bg-white rounded-lg p-3 shadow-sm border border-gray-200/50">
+                    <Filter className="h-4 w-4 text-gray-500" />
+                    <Select value={selectedTopic} onValueChange={setSelectedTopic}>
+                      <SelectTrigger className="w-64 border-0 shadow-none focus:ring-0">
+                        <SelectValue placeholder="Filtrar por tópico" />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {TOPIC_FILTERS.map((topic) => (
+                          <SelectItem key={topic} value={topic}>
+                            {topic}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </div>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
                 {filteredSpecializedApplications.map(renderApplicationCard)}
               </div>
             </section>
@@ -215,11 +225,18 @@ export const Dashboard = ({ user, onSelectApp, onLogout }: DashboardProps) => {
       </main>
 
       {/* Footer */}
-      <footer className="bg-white border-t border-gray-200 py-4">
+      <footer className="bg-white/80 backdrop-blur-sm border-t border-gray-200/60 py-6 mt-16">
         <div className="max-w-7xl mx-auto px-6">
-          <p className="text-center text-sm text-gray-600">
-            © 2025 Superintendencia de Banca, Seguros y AFP. Todos los derechos reservados.
-          </p>
+          <div className="flex flex-col sm:flex-row items-center justify-between space-y-4 sm:space-y-0">
+            <p className="text-sm text-gray-600">
+              © 2025 Superintendencia de Banca, Seguros y AFP. Todos los derechos reservados.
+            </p>
+            <div className="flex items-center space-x-2 text-sm text-gray-500">
+              <span>Sistema de Supervisión</span>
+              <span>•</span>
+              <span>v2.0</span>
+            </div>
+          </div>
         </div>
       </footer>
 
