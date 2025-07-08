@@ -80,7 +80,7 @@ export const ApplicationWindow = ({ application, user, onBack }: ApplicationWind
             <div className="space-y-2">
               <Button
                 onClick={handleDocumentUpload}
-                className="w-full bg-blue-900 hover:bg-blue-800"
+                className="w-full bg-primary hover:bg-primary/90"
               >
                 Carga Documental
               </Button>

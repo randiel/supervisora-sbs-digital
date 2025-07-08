@@ -82,8 +82,8 @@ export const Dashboard = ({ user, onSelectApp, onLogout }: DashboardProps) => {
       >
         <CardHeader className="pb-4">
           <div className="flex items-center space-x-3 mb-2">
-            <div className="w-10 h-10 bg-blue-100 rounded-lg flex items-center justify-center">
-              <IconComponent className="h-5 w-5 text-blue-900" />
+            <div className="w-10 h-10 bg-primary/10 rounded-lg flex items-center justify-center">
+              <IconComponent className="h-5 w-5 text-primary" />
             </div>
             <Badge variant="secondary" className="text-xs">
               SBS
@@ -97,7 +97,7 @@ export const Dashboard = ({ user, onSelectApp, onLogout }: DashboardProps) => {
           <p className="text-gray-600 text-sm mb-4">
             {app.description}
           </p>
-          <Button className="w-full bg-blue-900 hover:bg-blue-800">
+          <Button className="w-full bg-accent hover:bg-accent/90">
             Acceder
           </Button>
         </CardContent>
@@ -160,7 +160,7 @@ export const Dashboard = ({ user, onSelectApp, onLogout }: DashboardProps) => {
               Bienvenido, {user.name}
             </h2>
             <p className="text-gray-600">
-              Seleccione una aplicación para comenzar la supervisión
+              Seleccione una herramienta para comenzar la supervisión
             </p>
           </div>
 
@@ -171,7 +171,7 @@ export const Dashboard = ({ user, onSelectApp, onLogout }: DashboardProps) => {
                 Análisis Transversal
               </h3>
               <p className="text-gray-600 mb-4">
-                Estas aplicaciones permiten realizar análisis entre múltiples documentos y fuentes de información
+                Estas herramientas permiten realizar análisis entre múltiples documentos y fuentes de información
               </p>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {TRANSVERSAL_APPLICATIONS.map(renderApplicationCard)}
@@ -184,7 +184,7 @@ export const Dashboard = ({ user, onSelectApp, onLogout }: DashboardProps) => {
                 Análisis Especializado
               </h3>
               <p className="text-gray-600 mb-4">
-                Estas aplicaciones están enfocadas a ciertos productos del sistema financiero y permiten realizar análisis cruzados
+                Estas herramientas están enfocadas a ciertos productos del sistema financiero y permiten realizar análisis cruzados
               </p>
               
               {/* Filtro de Tópicos */}
