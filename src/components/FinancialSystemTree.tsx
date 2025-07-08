@@ -1,8 +1,9 @@
 
 import { useState } from 'react';
-import { ChevronDown, ChevronRight, Building2, CheckCircle } from 'lucide-react';
+import { ChevronDown, ChevronRight, Building2, CheckCircle, HelpCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { FinancialEntity } from './ApplicationWindow';
+import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 
 interface TreeNode {
   id: string;
@@ -10,76 +11,69 @@ interface TreeNode {
   children?: TreeNode[];
   isEntity?: boolean;
   license?: string;
+  tooltip?: string;
 }
 
-const financialSystemData: TreeNode = {
-  id: 'root',
-  name: 'Sistema Financiero',
-  children: [
-    {
-      id: 'banks',
-      name: 'Bancos',
-      children: [
-        { id: 'bcp', name: 'Banco de Crédito del Perú', isEntity: true, license: 'Bancos' },
-        { id: 'continental', name: 'Banco Continental', isEntity: true, license: 'Bancos' },
-        { id: 'pichincha', name: 'Banco Pichincha', isEntity: true, license: 'Bancos' },
-        { id: 'scotiabank', name: 'Scotiabank Perú', isEntity: true, license: 'Bancos' },
-        { id: 'interbank', name: 'Interbank', isEntity: true, license: 'Bancos' }
-      ]
-    },
-    {
-      id: 'financieras',
-      name: 'Financieras',
-      children: [
-        { id: 'crediscotia', name: 'CrediScotia Financiera', isEntity: true, license: 'Financieras' },
-        { id: 'compartamos', name: 'Financiera Compartamos', isEntity: true, license: 'Financieras' },
-        { id: 'proempresa', name: 'Financiera Proempresa', isEntity: true, license: 'Financieras' }
-      ]
-    },
-    {
-      id: 'cooperativas',
-      name: 'Cooperativas',
-      children: [
-        { id: 'abaco', name: 'Cooperativa Abaco', isEntity: true, license: 'Cooperativas' },
-        { id: 'san-pedro', name: 'Cooperativa San Pedro de Lajas', isEntity: true, license: 'Cooperativas' }
-      ]
-    },
-    {
-      id: 'cajas',
-      name: 'Cajas',
-      children: [
-        { id: 'arequipa', name: 'Caja Arequipa', isEntity: true, license: 'Cajas' },
-        { id: 'trujillo', name: 'Caja Trujillo', isEntity: true, license: 'Cajas' },
-        { id: 'huancayo', name: 'Caja Huancayo', isEntity: true, license: 'Cajas' }
-      ]
-    },
-    {
-      id: 'seguros',
-      name: 'Seguros',
-      children: [
-        { id: 'rimac', name: 'Rimac Seguros', isEntity: true, license: 'Seguros' },
-        { id: 'pacifico', name: 'Pacífico Seguros', isEntity: true, license: 'Seguros' },
-        { id: 'mapfre', name: 'Mapfre Perú', isEntity: true, license: 'Seguros' }
-      ]
-    },
-    {
-      id: 'afp',
-      name: 'AFP',
-      children: [
-        { id: 'prima', name: 'AFP Prima', isEntity: true, license: 'AFP' },
-        { id: 'integra', name: 'AFP Integra', isEntity: true, license: 'AFP' },
-        { id: 'habitat', name: 'AFP Hábitat', isEntity: true, license: 'AFP' }
-      ]
-    }
-  ]
-};
+const financialSystemData: TreeNode[] = [
+  {
+    id: 'seguros',
+    name: 'Seguros',
+    children: [
+      { id: 'ace', name: 'ACE', isEntity: true, license: 'Seguros' },
+      { id: 'avla-peru', name: 'Avla Perú', isEntity: true, license: 'Seguros' },
+      { id: 'cardif', name: 'Cardif', isEntity: true, license: 'Seguros' },
+      { id: 'chubb-peru', name: 'Chubb Perú', isEntity: true, license: 'Seguros' },
+      { id: 'coface', name: 'Coface', isEntity: true, license: 'Seguros' },
+      { id: 'crecer-seguros', name: 'Crecer Seguros', isEntity: true, license: 'Seguros' },
+      { id: 'el-pacifico-vida', name: 'El Pacífico Vida', isEntity: true, license: 'Seguros' },
+      { id: 'generali-peru', name: 'Generali Perú', isEntity: true, license: 'Seguros' },
+      { id: 'insur', name: 'Insur', isEntity: true, license: 'Seguros' },
+      { id: 'interseguro', name: 'Interseguro', isEntity: true, license: 'Seguros' },
+      { id: 'la-positiva', name: 'La Positiva', isEntity: true, license: 'Seguros' },
+      { id: 'la-positiva-vida', name: 'La Positiva Vida', isEntity: true, license: 'Seguros' },
+      { id: 'latina-xxx', name: 'Latina XXX', isEntity: true, license: 'Seguros' },
+      { id: 'liberty-seguros', name: 'Liberty Seguros', isEntity: true, license: 'Seguros' },
+      { id: 'mapfre-peru-1', name: 'Mapfre Perú', isEntity: true, license: 'Seguros' },
+      { id: 'mapfre-peru-2', name: 'Mapfre Perú', isEntity: true, license: 'Seguros' },
+      { id: 'ohio-national', name: 'Ohio National', isEntity: true, license: 'Seguros' },
+      { id: 'pacifico-1', name: 'Pacífico', isEntity: true, license: 'Seguros' },
+      { id: 'pacifico-2', name: 'Pacífico', isEntity: true, license: 'Seguros' },
+      { id: 'protecta', name: 'Protecta', isEntity: true, license: 'Seguros' },
+      { id: 'qualitas', name: 'Qualitas', isEntity: true, license: 'Seguros' },
+      { id: 'rigel-peru', name: 'Rigel Perú', isEntity: true, license: 'Seguros' },
+      { id: 'rimac', name: 'Rímac', isEntity: true, license: 'Seguros' },
+      { id: 'secrex', name: 'Secrex', isEntity: true, license: 'Seguros' },
+      { id: 'sura', name: 'Sura', isEntity: true, license: 'Seguros' },
+      { id: 'vivir-seguros', name: 'Vivir Seguros', isEntity: true, license: 'Seguros' }
+    ]
+  },
+  {
+    id: 'afp',
+    name: 'AFP',
+    tooltip: 'Administradora de Fondos de Pensiones',
+    children: [
+      { id: 'afp-integra', name: 'AFP Integra', isEntity: true, license: 'AFP' },
+      { id: 'afp-prima', name: 'AFP Prima', isEntity: true, license: 'AFP' },
+      { id: 'afp-profuturo', name: 'AFP Profuturo', isEntity: true, license: 'AFP' },
+      { id: 'afp-habitat', name: 'AFP Hábitat', isEntity: true, license: 'AFP' }
+    ]
+  },
+  {
+    id: 'dcb',
+    name: 'DCB',
+    tooltip: 'Derrama y Caja de Beneficios',
+    children: [
+      { id: 'caja-militar-policia', name: 'Caja Militar Policia', isEntity: true, license: 'DCB' }
+    ]
+  }
+];
 
 interface FinancialSystemTreeProps {
   onEntitySelect: (entity: FinancialEntity) => void;
 }
 
 export const FinancialSystemTree = ({ onEntitySelect }: FinancialSystemTreeProps) => {
-  const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set(['root']));
+  const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
   const [selectedEntity, setSelectedEntity] = useState<string | null>(null);
 
   const toggleNode = (nodeId: string) => {
@@ -101,6 +95,26 @@ export const FinancialSystemTree = ({ onEntitySelect }: FinancialSystemTreeProps
         license: node.license!
       });
     }
+  };
+
+  const renderCategoryHeader = (node: TreeNode) => {
+    if (node.tooltip) {
+      return (
+        <HoverCard>
+          <HoverCardTrigger asChild>
+            <div className="flex items-center space-x-1 cursor-help">
+              <span className="font-medium text-gray-700">{node.name}</span>
+              <HelpCircle className="h-3 w-3 text-gray-400" />
+            </div>
+          </HoverCardTrigger>
+          <HoverCardContent className="w-64 p-3">
+            <p className="text-sm text-gray-600">{node.tooltip}</p>
+          </HoverCardContent>
+        </HoverCard>
+      );
+    }
+    
+    return <span className="font-medium text-gray-700">{node.name}</span>;
   };
 
   const renderNode = (node: TreeNode, level: number = 0) => {
@@ -142,9 +156,13 @@ export const FinancialSystemTree = ({ onEntitySelect }: FinancialSystemTreeProps
               <div className="w-4 h-4 bg-gray-300 rounded" />
             )}
             
-            <span className={`text-sm ${node.isEntity ? 'text-gray-900' : 'font-medium text-gray-700'}`}>
-              {node.name}
-            </span>
+            <div className="text-sm">
+              {node.isEntity ? (
+                <span className="text-gray-900">{node.name}</span>
+              ) : (
+                renderCategoryHeader(node)
+              )}
+            </div>
             
             {isSelected && (
               <CheckCircle className="h-4 w-4 text-blue-600 ml-auto" />
@@ -169,7 +187,7 @@ export const FinancialSystemTree = ({ onEntitySelect }: FinancialSystemTreeProps
         </h3>
       </div>
       <div className="p-2 max-h-96 overflow-y-auto">
-        {renderNode(financialSystemData)}
+        {financialSystemData.map(category => renderNode(category))}
       </div>
     </div>
   );
