@@ -1,4 +1,3 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
@@ -63,7 +62,7 @@ export const ApplicationWindow = ({ application, user, onBack }: ApplicationWind
         </div>
       </div>
       
-      <div className="w-80 border-l bg-gray-50 p-4">
+      <div className="w-96 border-l bg-gray-50 p-4 overflow-y-auto">
         <FinancialSystemTree onEntitySelect={handleEntitySelect} />
         
         {selectedEntity && (

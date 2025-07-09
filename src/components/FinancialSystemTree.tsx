@@ -1,7 +1,7 @@
-
 import { useState } from 'react';
-import { ChevronDown, ChevronRight, Building2, CheckCircle, HelpCircle } from 'lucide-react';
+import { ChevronDown, ChevronRight, Building2, CheckCircle, HelpCircle, Search, Folder, File } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { Input } from '@/components/ui/input';
 import { FinancialEntity } from './ApplicationWindow';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
 
@@ -12,6 +12,18 @@ interface TreeNode {
   isEntity?: boolean;
   license?: string;
   tooltip?: string;
+}
+
+interface FileItem {
+  id: string;
+  name: string;
+  size?: string;
+}
+
+interface FolderItem {
+  id: string;
+  name: string;
+  files: FileItem[];
 }
 
 const financialSystemData: TreeNode[] = [
@@ -209,6 +221,55 @@ const financialSystemData: TreeNode[] = [
   }
 ];
 
+// Mock data for folders and files
+const mockFoldersData: Record<string, FolderItem[]> = {
+  'afp-integra': [
+    {
+      id: 'carta-at01-soc2',
+      name: '201905 Carta sobre AT01 Soc2 Tipo II',
+      files: [
+        { id: 'carta-at01-1', name: 'CartaAT01_Soc2TipoII.pdf', size: '2.3 MB' },
+        { id: 'carta-at01-2', name: 'RespuestaAT01.pdf', size: '1.8 MB' }
+      ]
+    },
+    {
+      id: 'sae18',
+      name: '201905 SAE18',
+      files: [
+        { id: 'sae18-1', name: 'SAE18_Informe.pdf', size: '3.2 MB' },
+        { id: 'sae18-2', name: 'SAE18_Anexos.pdf', size: '4.1 MB' }
+      ]
+    },
+    {
+      id: 'calificacion-2019',
+      name: '201909 Calificación 2019',
+      files: [
+        { id: 'cal-2019-1', name: 'Calificacion2019_Final.pdf', size: '5.7 MB' },
+        { id: 'cal-2019-2', name: 'Anexo_Calificacion.pdf', size: '2.9 MB' }
+      ]
+    },
+    {
+      id: 'npci-video',
+      name: '202507 NPCI Video Inteligencia Palantir',
+      files: [
+        { id: 'npci-1', name: 'ActaN227CAROyGP06062025.pdf', size: '1.2 MB' },
+        { id: 'npci-2', name: 'EvaluacionDSSIT.pdf', size: '3.4 MB' },
+        { id: 'npci-3', name: 'Informe_00006_31122025.pdf', size: '2.8 MB' }
+      ]
+    }
+  ],
+  'banco-credito': [
+    {
+      id: 'auditoria-2024',
+      name: '202401 Auditoría Integral',
+      files: [
+        { id: 'audit-1', name: 'InformeAuditoria2024.pdf', size: '4.5 MB' },
+        { id: 'audit-2', name: 'PlanAccion.pdf', size: '1.9 MB' }
+      ]
+    }
+  ]
+};
+
 interface FinancialSystemTreeProps {
   onEntitySelect: (entity: FinancialEntity) => void;
 }
@@ -216,6 +277,9 @@ interface FinancialSystemTreeProps {
 export const FinancialSystemTree = ({ onEntitySelect }: FinancialSystemTreeProps) => {
   const [expandedNodes, setExpandedNodes] = useState<Set<string>>(new Set());
   const [selectedEntity, setSelectedEntity] = useState<string | null>(null);
+  const [searchTerm, setSearchTerm] = useState('');
+  const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set());
+  const [selectedFiles, setSelectedFiles] = useState<Set<string>>(new Set());
 
   const toggleNode = (nodeId: string) => {
     const newExpanded = new Set(expandedNodes);
@@ -225,6 +289,26 @@ export const FinancialSystemTree = ({ onEntitySelect }: FinancialSystemTreeProps
       newExpanded.add(nodeId);
     }
     setExpandedNodes(newExpanded);
+  };
+
+  const toggleFolder = (folderId: string) => {
+    const newExpanded = new Set(expandedFolders);
+    if (newExpanded.has(folderId)) {
+      newExpanded.delete(folderId);
+    } else {
+      newExpanded.add(folderId);
+    }
+    setExpandedFolders(newExpanded);
+  };
+
+  const toggleFileSelection = (fileId: string) => {
+    const newSelected = new Set(selectedFiles);
+    if (newSelected.has(fileId)) {
+      newSelected.delete(fileId);
+    } else {
+      newSelected.add(fileId);
+    }
+    setSelectedFiles(newSelected);
   };
 
   const handleEntitySelect = (node: TreeNode) => {
@@ -237,6 +321,33 @@ export const FinancialSystemTree = ({ onEntitySelect }: FinancialSystemTreeProps
       });
     }
   };
+
+  const filterNodes = (nodes: TreeNode[], searchTerm: string): TreeNode[] => {
+    if (!searchTerm) return nodes;
+
+    const filtered: TreeNode[] = [];
+    
+    for (const node of nodes) {
+      const matchesName = node.name.toLowerCase().includes(searchTerm.toLowerCase());
+      const matchesLicense = node.license?.toLowerCase().includes(searchTerm.toLowerCase());
+      
+      if (matchesName || matchesLicense) {
+        filtered.push(node);
+      } else if (node.children) {
+        const filteredChildren = filterNodes(node.children, searchTerm);
+        if (filteredChildren.length > 0) {
+          filtered.push({
+            ...node,
+            children: filteredChildren
+          });
+        }
+      }
+    }
+    
+    return filtered;
+  };
+
+  const filteredData = filterNodes(financialSystemData, searchTerm);
 
   const renderCategoryHeader = (node: TreeNode) => {
     if (node.tooltip) {
@@ -320,16 +431,125 @@ export const FinancialSystemTree = ({ onEntitySelect }: FinancialSystemTreeProps
     );
   };
 
+  const renderFoldersTree = () => {
+    if (!selectedEntity) return null;
+
+    const folders = mockFoldersData[selectedEntity] || [];
+    if (folders.length === 0) return null;
+
+    const selectedEntityNode = findEntityById(selectedEntity);
+    if (!selectedEntityNode) return null;
+
+    return (
+      <div className="mt-4 bg-white rounded-lg border">
+        <div className="p-3 border-b bg-gray-50 rounded-t-lg">
+          <h4 className="text-sm font-semibold text-gray-900">
+            Carpetas - {selectedEntityNode.name}
+          </h4>
+        </div>
+        <div className="p-2 max-h-64 overflow-y-auto">
+          {folders.map(folder => (
+            <div key={folder.id}>
+              <div 
+                className="flex items-center py-2 px-2 rounded cursor-pointer hover:bg-gray-100"
+                onClick={() => toggleFolder(folder.id)}
+              >
+                <div className="flex items-center space-x-2 flex-1">
+                  <Button variant="ghost" size="sm" className="h-4 w-4 p-0">
+                    {expandedFolders.has(folder.id) ? (
+                      <ChevronDown className="h-3 w-3" />
+                    ) : (
+                      <ChevronRight className="h-3 w-3" />
+                    )}
+                  </Button>
+                  <Folder className="h-4 w-4 text-yellow-600" />
+                  <span className="text-sm text-gray-900">{folder.name}</span>
+                </div>
+              </div>
+              
+              {expandedFolders.has(folder.id) && (
+                <div className="ml-8">
+                  {folder.files.map(file => (
+                    <div 
+                      key={file.id}
+                      className={`flex items-center py-1 px-2 rounded cursor-pointer hover:bg-gray-100 ${
+                        selectedFiles.has(file.id) ? 'bg-blue-50 border border-blue-200' : ''
+                      }`}
+                      onClick={() => toggleFileSelection(file.id)}
+                    >
+                      <div className="flex items-center space-x-2 flex-1">
+                        <div className="w-4" />
+                        {selectedFiles.has(file.id) ? (
+                          <CheckCircle className="h-4 w-4 text-blue-600" />
+                        ) : (
+                          <div className="w-4 h-4 border border-gray-300 rounded" />
+                        )}
+                        <File className="h-4 w-4 text-gray-500" />
+                        <div className="flex-1">
+                          <span className="text-sm text-gray-900">{file.name}</span>
+                          {file.size && (
+                            <span className="text-xs text-gray-500 ml-2">({file.size})</span>
+                          )}
+                        </div>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+        {selectedFiles.size > 0 && (
+          <div className="p-3 border-t bg-gray-50">
+            <p className="text-sm text-gray-600">
+              {selectedFiles.size} archivo{selectedFiles.size !== 1 ? 's' : ''} seleccionado{selectedFiles.size !== 1 ? 's' : ''}
+            </p>
+          </div>
+        )}
+      </div>
+    );
+  };
+
+  const findEntityById = (entityId: string): TreeNode | null => {
+    const findInNodes = (nodes: TreeNode[]): TreeNode | null => {
+      for (const node of nodes) {
+        if (node.id === entityId && node.isEntity) {
+          return node;
+        }
+        if (node.children) {
+          const found = findInNodes(node.children);
+          if (found) return found;
+        }
+      }
+      return null;
+    };
+    return findInNodes(financialSystemData);
+  };
+
   return (
-    <div className="bg-white rounded-lg border">
-      <div className="p-3 border-b bg-gray-50 rounded-t-lg">
-        <h3 className="text-sm font-semibold text-gray-900">
-          Entidades del Sistema Financiero
-        </h3>
+    <div className="space-y-4">
+      <div className="bg-white rounded-lg border">
+        <div className="p-3 border-b bg-gray-50 rounded-t-lg">
+          <h3 className="text-sm font-semibold text-gray-900 mb-3">
+            Entidades del Sistema Financiero
+          </h3>
+          <div className="relative">
+            <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-gray-400" />
+            <Input
+              type="text"
+              placeholder="Buscar entidad o categoría..."
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="pl-10 h-9 text-sm"
+            />
+          </div>
+        </div>
+        <div className="p-2 max-h-96 overflow-y-auto">
+          {filteredData.map(category => renderNode(category))}
+        </div>
       </div>
-      <div className="p-2 max-h-96 overflow-y-auto">
-        {financialSystemData.map(category => renderNode(category))}
-      </div>
+
+      {renderFoldersTree()}
     </div>
   );
 };
