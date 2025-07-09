@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { ArrowLeft } from 'lucide-react';
 import { User, Application } from '@/pages/Index';
-import { FinancialSystemTree } from './FinancialSystemTree';
+import { FinancialSystemTree, FinancialEntity } from './FinancialSystemTree';
 import { DocumentUpload } from './DocumentUpload';
 import { BatchAnalytics } from './BatchAnalytics';
 import { SupervisorAgent } from './SupervisorAgent';
@@ -12,12 +12,6 @@ interface ApplicationWindowProps {
   user: User;
   onBack: () => void;
 }
-
-export type FinancialEntity = {
-  id: string;
-  name: string;
-  license: string;
-};
 
 type ActiveSection = 'main' | 'upload' | 'analytics' | 'agent';
 
