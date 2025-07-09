@@ -1,11 +1,10 @@
-
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
 import { ArrowLeft, Send, Paperclip, FileText, ExternalLink } from 'lucide-react';
-import { FinancialEntity } from './ApplicationWindow';
+import { FinancialEntity } from './FinancialSystemTree/types';
 
 interface SupervisorAgentProps {
   entity: FinancialEntity;

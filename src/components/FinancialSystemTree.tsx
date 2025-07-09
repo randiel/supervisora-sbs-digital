@@ -1,11 +1,10 @@
-
 import { FinancialEntity, FinancialSystemTreeProps } from './FinancialSystemTree/types';
 import { useTreeState } from './FinancialSystemTree/useTreeState';
 import { TreeNode } from './FinancialSystemTree/TreeNode';
 import { FoldersTree } from './FinancialSystemTree/FoldersTree';
 import { SearchBar } from './FinancialSystemTree/SearchBar';
 
-export { FinancialEntity } from './FinancialSystemTree/types';
+export type { FinancialEntity } from './FinancialSystemTree/types';
 
 export const FinancialSystemTree = ({ onEntitySelect }: FinancialSystemTreeProps) => {
   const {

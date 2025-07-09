@@ -1,8 +1,9 @@
+
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
 import { ArrowLeft, Upload, Plus, FileText, X, Eye } from 'lucide-react';
-import { FinancialEntity } from './ApplicationWindow';
+import { FinancialEntity } from './FinancialSystemTree/types';
 import { Application } from '@/pages/Index';
 import { toast } from '@/hooks/use-toast';
 

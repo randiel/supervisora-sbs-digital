@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { ArrowLeft, Play, Download } from 'lucide-react';
-import { FinancialEntity } from './ApplicationWindow';
+import { FinancialEntity } from './FinancialSystemTree/types';
 import { toast } from '@/hooks/use-toast';
 import { AdditionalParametersModal, AdditionalParameters } from './AdditionalParametersModal';
 import { Timer } from './Timer';
