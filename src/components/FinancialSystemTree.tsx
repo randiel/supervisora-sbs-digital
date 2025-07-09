@@ -1,9 +1,10 @@
 import { useState } from 'react';
-import { ChevronDown, ChevronRight, Building2, CheckCircle, HelpCircle, Search, Folder, File } from 'lucide-react';
+import { ChevronDown, ChevronRight, Building2, CheckCircle, HelpCircle, Search, Folder, File, Eye } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { FinancialEntity } from './ApplicationWindow';
 import { HoverCard, HoverCardContent, HoverCardTrigger } from '@/components/ui/hover-card';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger } from '@/components/ui/dialog';
 
 interface TreeNode {
   id: string;
@@ -221,7 +222,7 @@ const financialSystemData: TreeNode[] = [
   }
 ];
 
-// Mock data for folders and files
+// Expanded mock data for folders and files
 const mockFoldersData: Record<string, FolderItem[]> = {
   'afp-integra': [
     {
@@ -265,6 +266,138 @@ const mockFoldersData: Record<string, FolderItem[]> = {
       files: [
         { id: 'audit-1', name: 'InformeAuditoria2024.pdf', size: '4.5 MB' },
         { id: 'audit-2', name: 'PlanAccion.pdf', size: '1.9 MB' }
+      ]
+    },
+    {
+      id: 'estados-financieros',
+      name: '202312 Estados Financieros',
+      files: [
+        { id: 'eeff-1', name: 'EstadosFinancieros_Dic2023.pdf', size: '6.2 MB' },
+        { id: 'eeff-2', name: 'NotasExplicativas.pdf', size: '3.8 MB' },
+        { id: 'eeff-3', name: 'DictamenAuditor.pdf', size: '1.5 MB' }
+      ]
+    },
+    {
+      id: 'compliance-2023',
+      name: '202306 Compliance Report',
+      files: [
+        { id: 'comp-1', name: 'ComplianceReport_2023.pdf', size: '2.7 MB' }
+      ]
+    }
+  ],
+  'interbank': [
+    {
+      id: 'riesgo-operacional',
+      name: '202403 Gestión Riesgo Operacional',
+      files: [
+        { id: 'riesgo-1', name: 'InformeRiesgoOperacional.pdf', size: '3.1 MB' },
+        { id: 'riesgo-2', name: 'MatrizRiesgos.xlsx', size: '892 KB' }
+      ]
+    },
+    {
+      id: 'basilea-iii',
+      name: '202312 Implementación Basilea III',
+      files: [
+        { id: 'basilea-1', name: 'BasileaIII_Reporte.pdf', size: '4.8 MB' },
+        { id: 'basilea-2', name: 'CalculosCapital.xlsx', size: '1.2 MB' },
+        { id: 'basilea-3', name: 'PlanImplementacion.pdf', size: '2.3 MB' }
+      ]
+    }
+  ],
+  'scotiabank': [
+    {
+      id: 'lavado-activos',
+      name: '202402 Prevención Lavado Activos',
+      files: [
+        { id: 'pla-1', name: 'ManualPLA.pdf', size: '5.4 MB' },
+        { id: 'pla-2', name: 'ProcedimientosDDC.pdf', size: '2.1 MB' }
+      ]
+    },
+    {
+      id: 'stress-testing',
+      name: '202401 Stress Testing',
+      files: [
+        { id: 'stress-1', name: 'StressTest_Results.pdf', size: '3.9 MB' }
+      ]
+    },
+    {
+      id: 'gobierno-corporativo',
+      name: '202312 Gobierno Corporativo',
+      files: [
+        { id: 'gc-1', name: 'InformeGobiernoCorporativo.pdf', size: '4.2 MB' },
+        { id: 'gc-2', name: 'EstatutosSociales.pdf', size: '1.8 MB' }
+      ]
+    }
+  ],
+  'rimac': [
+    {
+      id: 'solvencia-ii',
+      name: '202312 Solvencia II',
+      files: [
+        { id: 'solv-1', name: 'ReporteSolvenciaII.pdf', size: '6.1 MB' },
+        { id: 'solv-2', name: 'CalculoSCR.xlsx', size: '2.4 MB' }
+      ]
+    },
+    {
+      id: 'reservas-tecnicas',
+      name: '202403 Reservas Técnicas',
+      files: [
+        { id: 'rt-1', name: 'CalculoReservas.pdf', size: '3.7 MB' },
+        { id: 'rt-2', name: 'ValidacionActuarial.pdf', size: '2.9 MB' },
+        { id: 'rt-3', name: 'MetodologiaReservas.pdf', size: '4.1 MB' }
+      ]
+    }
+  ],
+  'pacifico-1': [
+    {
+      id: 'reaseguros',
+      name: '202401 Programa Reaseguros',
+      files: [
+        { id: 'reas-1', name: 'ProgramaReaseguros2024.pdf', size: '3.8 MB' },
+        { id: 'reas-2', name: 'ContratosCesion.pdf', size: '5.2 MB' }
+      ]
+    },
+    {
+      id: 'catastrofes',
+      name: '202312 Análisis Catástrofes',
+      files: [
+        { id: 'cat-1', name: 'ModeloCatastrofes.pdf', size: '4.6 MB' }
+      ]
+    }
+  ],
+  'cmac-arequipa': [
+    {
+      id: 'microfinanzas',
+      name: '202402 Cartera Microfinanzas',
+      files: [
+        { id: 'micro-1', name: 'InformeMicrofinanzas.pdf', size: '2.8 MB' },
+        { id: 'micro-2', name: 'AnalisisRiesgo.pdf', size: '1.9 MB' }
+      ]
+    },
+    {
+      id: 'inclusion-financiera',
+      name: '202312 Inclusión Financiera',
+      files: [
+        { id: 'if-1', name: 'ProgramaInclusionFinanciera.pdf', size: '3.5 MB' },
+        { id: 'if-2', name: 'IndicadoresAcceso.xlsx', size: '756 KB' },
+        { id: 'if-3', name: 'EducacionFinanciera.pdf', size: '2.2 MB' }
+      ]
+    }
+  ],
+  'mibanco': [
+    {
+      id: 'pyme-lending',
+      name: '202403 Créditos PYME',
+      files: [
+        { id: 'pyme-1', name: 'CreditosPYME_Analisis.pdf', size: '3.1 MB' },
+        { id: 'pyme-2', name: 'ScoringPYME.pdf', size: '2.4 MB' }
+      ]
+    },
+    {
+      id: 'digital-banking',
+      name: '202401 Banca Digital',
+      files: [
+        { id: 'digital-1', name: 'EstrategiaBancaDigital.pdf', size: '4.3 MB' }
       ]
     }
   ]
@@ -369,6 +502,22 @@ export const FinancialSystemTree = ({ onEntitySelect }: FinancialSystemTreeProps
     return <span className="font-medium text-gray-700">{node.name}</span>;
   };
 
+  const getSelectedFilesDetails = () => {
+    const details: Array<{ file: FileItem; folder: string }> = [];
+    
+    if (selectedEntity && mockFoldersData[selectedEntity]) {
+      mockFoldersData[selectedEntity].forEach(folder => {
+        folder.files.forEach(file => {
+          if (selectedFiles.has(file.id)) {
+            details.push({ file, folder: folder.name });
+          }
+        });
+      });
+    }
+    
+    return details;
+  };
+
   const renderNode = (node: TreeNode, level: number = 0) => {
     const isExpanded = expandedNodes.has(node.id);
     const hasChildren = node.children && node.children.length > 0;
@@ -440,6 +589,8 @@ export const FinancialSystemTree = ({ onEntitySelect }: FinancialSystemTreeProps
     const selectedEntityNode = findEntityById(selectedEntity);
     if (!selectedEntityNode) return null;
 
+    const selectedFilesDetails = getSelectedFilesDetails();
+
     return (
       <div className="mt-4 bg-white rounded-lg border">
         <div className="p-3 border-b bg-gray-50 rounded-t-lg">
@@ -500,10 +651,40 @@ export const FinancialSystemTree = ({ onEntitySelect }: FinancialSystemTreeProps
           ))}
         </div>
         {selectedFiles.size > 0 && (
-          <div className="p-3 border-t bg-gray-50">
+          <div className="p-3 border-t bg-gray-50 flex items-center justify-between">
             <p className="text-sm text-gray-600">
               {selectedFiles.size} archivo{selectedFiles.size !== 1 ? 's' : ''} seleccionado{selectedFiles.size !== 1 ? 's' : ''}
             </p>
+            <Dialog>
+              <DialogTrigger asChild>
+                <Button variant="outline" size="sm" className="ml-2">
+                  <Eye className="h-4 w-4 mr-1" />
+                  Ver detalles
+                </Button>
+              </DialogTrigger>
+              <DialogContent className="max-w-2xl max-h-[80vh] overflow-y-auto">
+                <DialogHeader>
+                  <DialogTitle>Archivos Seleccionados</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  {selectedFilesDetails.map(({ file, folder }, index) => (
+                    <div key={file.id} className="border rounded-lg p-4">
+                      <div className="flex items-start justify-between">
+                        <div className="flex-1">
+                          <h4 className="font-medium text-gray-900 mb-1">{file.name}</h4>
+                          <p className="text-sm text-gray-600 mb-2">Carpeta: {folder}</p>
+                          <div className="flex items-center space-x-4 text-xs text-gray-500">
+                            <span>Tamaño: {file.size || 'N/A'}</span>
+                            <span>Entidad: {selectedEntityNode.name}</span>
+                          </div>
+                        </div>
+                        <File className="h-8 w-8 text-gray-400 ml-4" />
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              </DialogContent>
+            </Dialog>
           </div>
         )}
       </div>
