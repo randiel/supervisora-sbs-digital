@@ -9,6 +9,8 @@ interface TreeNodeProps {
   level: number;
   isExpanded: boolean;
   isSelected: boolean;
+  expandedNodes: Set<string>;
+  selectedEntity: string | null;
   onToggle: (nodeId: string) => void;
   onEntitySelect: (entity: FinancialEntity) => void;
 }
@@ -18,6 +20,8 @@ export const TreeNode = ({
   level, 
   isExpanded, 
   isSelected, 
+  expandedNodes,
+  selectedEntity,
   onToggle, 
   onEntitySelect 
 }: TreeNodeProps) => {
@@ -104,8 +108,10 @@ export const TreeNode = ({
               key={child.id}
               node={child}
               level={level + 1}
-              isExpanded={isExpanded}
-              isSelected={isSelected}
+              isExpanded={expandedNodes.has(child.id)}
+              isSelected={selectedEntity === child.id}
+              expandedNodes={expandedNodes}
+              selectedEntity={selectedEntity}
               onToggle={onToggle}
               onEntitySelect={onEntitySelect}
             />

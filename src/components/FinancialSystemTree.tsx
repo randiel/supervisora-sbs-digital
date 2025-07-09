@@ -1,3 +1,4 @@
+
 import { FinancialEntity, FinancialSystemTreeProps } from './FinancialSystemTree/types';
 import { useTreeState } from './FinancialSystemTree/useTreeState';
 import { TreeNode } from './FinancialSystemTree/TreeNode';
@@ -35,6 +36,8 @@ export const FinancialSystemTree = ({ onEntitySelect }: FinancialSystemTreeProps
         level={0}
         isExpanded={expandedNodes.has(category.id)}
         isSelected={selectedEntity === category.id}
+        expandedNodes={expandedNodes}
+        selectedEntity={selectedEntity}
         onToggle={toggleNode}
         onEntitySelect={handleEntitySelect}
       />

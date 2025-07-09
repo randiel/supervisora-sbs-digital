@@ -1,4 +1,3 @@
-
 import { TreeNode, FolderItem } from './types';
 
 export const financialSystemData: TreeNode[] = [
@@ -196,182 +195,175 @@ export const financialSystemData: TreeNode[] = [
   }
 ];
 
-export const mockFoldersData: Record<string, FolderItem[]> = {
-  'afp-integra': [
+// Función para generar datos simulados de carpetas y archivos
+const generateMockFoldersForEntity = (entityId: string, entityName: string, license: string): FolderItem[] => {
+  const baseTemplates = [
     {
-      id: 'carta-at01-soc2',
-      name: '201905 Carta sobre AT01 Soc2 Tipo II',
+      prefix: '202401',
+      name: 'Auditoría Integral',
       files: [
-        { id: 'carta-at01-1', name: 'CartaAT01_Soc2TipoII.pdf', size: '2.3 MB' },
-        { id: 'carta-at01-2', name: 'RespuestaAT01.pdf', size: '1.8 MB' }
+        { name: 'InformeAuditoria.pdf', size: '4.5 MB' },
+        { name: 'PlanAccion.pdf', size: '1.9 MB' }
       ]
     },
     {
-      id: 'sae18',
-      name: '201905 SAE18',
+      prefix: '202312', 
+      name: 'Estados Financieros',
       files: [
-        { id: 'sae18-1', name: 'SAE18_Informe.pdf', size: '3.2 MB' },
-        { id: 'sae18-2', name: 'SAE18_Anexos.pdf', size: '4.1 MB' }
+        { name: 'EstadosFinancieros.pdf', size: '6.2 MB' },
+        { name: 'NotasExplicativas.pdf', size: '3.8 MB' },
+        { name: 'DictamenAuditor.pdf', size: '1.5 MB' }
       ]
     },
     {
-      id: 'calificacion-2019',
-      name: '201909 Calificación 2019',
+      prefix: '202403',
+      name: 'Gestión de Riesgos',
       files: [
-        { id: 'cal-2019-1', name: 'Calificacion2019_Final.pdf', size: '5.7 MB' },
-        { id: 'cal-2019-2', name: 'Anexo_Calificacion.pdf', size: '2.9 MB' }
-      ]
-    },
-    {
-      id: 'npci-video',
-      name: '202507 NPCI Video Inteligencia Palantir',
-      files: [
-        { id: 'npci-1', name: 'ActaN227CAROyGP06062025.pdf', size: '1.2 MB' },
-        { id: 'npci-2', name: 'EvaluacionDSSIT.pdf', size: '3.4 MB' },
-        { id: 'npci-3', name: 'Informe_00006_31122025.pdf', size: '2.8 MB' }
+        { name: 'InformeRiesgos.pdf', size: '3.1 MB' },
+        { name: 'MatrizRiesgos.xlsx', size: '892 KB' }
       ]
     }
-  ],
-  'banco-credito': [
-    {
-      id: 'auditoria-2024',
-      name: '202401 Auditoría Integral',
-      files: [
-        { id: 'audit-1', name: 'InformeAuditoria2024.pdf', size: '4.5 MB' },
-        { id: 'audit-2', name: 'PlanAccion.pdf', size: '1.9 MB' }
-      ]
-    },
-    {
-      id: 'estados-financieros',
-      name: '202312 Estados Financieros',
-      files: [
-        { id: 'eeff-1', name: 'EstadosFinancieros_Dic2023.pdf', size: '6.2 MB' },
-        { id: 'eeff-2', name: 'NotasExplicativas.pdf', size: '3.8 MB' },
-        { id: 'eeff-3', name: 'DictamenAuditor.pdf', size: '1.5 MB' }
-      ]
-    },
-    {
-      id: 'compliance-2023',
-      name: '202306 Compliance Report',
-      files: [
-        { id: 'comp-1', name: 'ComplianceReport_2023.pdf', size: '2.7 MB' }
-      ]
-    }
-  ],
-  'interbank': [
-    {
-      id: 'riesgo-operacional',
-      name: '202403 Gestión Riesgo Operacional',
-      files: [
-        { id: 'riesgo-1', name: 'InformeRiesgoOperacional.pdf', size: '3.1 MB' },
-        { id: 'riesgo-2', name: 'MatrizRiesgos.xlsx', size: '892 KB' }
-      ]
-    },
-    {
-      id: 'basilea-iii',
-      name: '202312 Implementación Basilea III',
-      files: [
-        { id: 'basilea-1', name: 'BasileaIII_Reporte.pdf', size: '4.8 MB' },
-        { id: 'basilea-2', name: 'CalculosCapital.xlsx', size: '1.2 MB' },
-        { id: 'basilea-3', name: 'PlanImplementacion.pdf', size: '2.3 MB' }
-      ]
-    }
-  ],
-  'scotiabank': [
-    {
-      id: 'lavado-activos',
-      name: '202402 Prevención Lavado Activos',
-      files: [
-        { id: 'pla-1', name: 'ManualPLA.pdf', size: '5.4 MB' },
-        { id: 'pla-2', name: 'ProcedimientosDDC.pdf', size: '2.1 MB' }
-      ]
-    },
-    {
-      id: 'stress-testing',
-      name: '202401 Stress Testing',
-      files: [
-        { id: 'stress-1', name: 'StressTest_Results.pdf', size: '3.9 MB' }
-      ]
-    },
-    {
-      id: 'gobierno-corporativo',
-      name: '202312 Gobierno Corporativo',
-      files: [
-        { id: 'gc-1', name: 'InformeGobiernoCorporativo.pdf', size: '4.2 MB' },
-        { id: 'gc-2', name: 'EstatutosSociales.pdf', size: '1.8 MB' }
-      ]
-    }
-  ],
-  'rimac': [
-    {
-      id: 'solvencia-ii',
-      name: '202312 Solvencia II',
-      files: [
-        { id: 'solv-1', name: 'ReporteSolvenciaII.pdf', size: '6.1 MB' },
-        { id: 'solv-2', name: 'CalculoSCR.xlsx', size: '2.4 MB' }
-      ]
-    },
-    {
-      id: 'reservas-tecnicas',
-      name: '202403 Reservas Técnicas',
-      files: [
-        { id: 'rt-1', name: 'CalculoReservas.pdf', size: '3.7 MB' },
-        { id: 'rt-2', name: 'ValidacionActuarial.pdf', size: '2.9 MB' },
-        { id: 'rt-3', name: 'MetodologiaReservas.pdf', size: '4.1 MB' }
-      ]
-    }
-  ],
-  'pacifico-1': [
-    {
-      id: 'reaseguros',
-      name: '202401 Programa Reaseguros',
-      files: [
-        { id: 'reas-1', name: 'ProgramaReaseguros2024.pdf', size: '3.8 MB' },
-        { id: 'reas-2', name: 'ContratosCesion.pdf', size: '5.2 MB' }
-      ]
-    },
-    {
-      id: 'catastrofes',
-      name: '202312 Análisis Catástrofes',
-      files: [
-        { id: 'cat-1', name: 'ModeloCatastrofes.pdf', size: '4.6 MB' }
-      ]
-    }
-  ],
-  'cmac-arequipa': [
-    {
-      id: 'microfinanzas',
-      name: '202402 Cartera Microfinanzas',
-      files: [
-        { id: 'micro-1', name: 'InformeMicrofinanzas.pdf', size: '2.8 MB' },
-        { id: 'micro-2', name: 'AnalisisRiesgo.pdf', size: '1.9 MB' }
-      ]
-    },
-    {
-      id: 'inclusion-financiera',
-      name: '202312 Inclusión Financiera',
-      files: [
-        { id: 'if-1', name: 'ProgramaInclusionFinanciera.pdf', size: '3.5 MB' },
-        { id: 'if-2', name: 'IndicadoresAcceso.xlsx', size: '756 KB' },
-        { id: 'if-3', name: 'EducacionFinanciera.pdf', size: '2.2 MB' }
-      ]
-    }
-  ],
-  'mibanco': [
-    {
-      id: 'pyme-lending',
-      name: '202403 Créditos PYME',
-      files: [
-        { id: 'pyme-1', name: 'CreditosPYME_Analisis.pdf', size: '3.1 MB' },
-        { id: 'pyme-2', name: 'ScoringPYME.pdf', size: '2.4 MB' }
-      ]
-    },
-    {
-      id: 'digital-banking',
-      name: '202401 Banca Digital',
-      files: [
-        { id: 'digital-1', name: 'EstrategiaBancaDigital.pdf', size: '4.3 MB' }
-      ]
-    }
-  ]
+  ];
+
+  // Plantillas específicas por tipo de licencia
+  const licenseSpecificTemplates: Record<string, Array<{prefix: string, name: string, files: Array<{name: string, size: string}>}>> = {
+    'Banco': [
+      {
+        prefix: '202402',
+        name: 'Prevención Lavado Activos',
+        files: [
+          { name: 'ManualPLA.pdf', size: '5.4 MB' },
+          { name: 'ProcedimientosDDC.pdf', size: '2.1 MB' }
+        ]
+      },
+      {
+        prefix: '202401',
+        name: 'Basilea III',
+        files: [
+          { name: 'BasileaIII_Reporte.pdf', size: '4.8 MB' },
+          { name: 'CalculosCapital.xlsx', size: '1.2 MB' }
+        ]
+      }
+    ],
+    'AFP': [
+      {
+        prefix: '202401',
+        name: 'Gestión de Fondos',
+        files: [
+          { name: 'InformeFondos.pdf', size: '3.7 MB' },
+          { name: 'RentabilidadFondos.xlsx', size: '1.4 MB' }
+        ]
+      },
+      {
+        prefix: '202312',
+        name: 'Aportes y Beneficios',
+        files: [
+          { name: 'ReporteAportes.pdf', size: '2.9 MB' },
+          { name: 'CalculoBeneficios.pdf', size: '2.1 MB' }
+        ]
+      }
+    ],
+    'Seguros': [
+      {
+        prefix: '202312',
+        name: 'Solvencia II',
+        files: [
+          { name: 'ReporteSolvencia.pdf', size: '6.1 MB' },
+          { name: 'CalculoSCR.xlsx', size: '2.4 MB' }
+        ]
+      },
+      {
+        prefix: '202403',
+        name: 'Reservas Técnicas',
+        files: [
+          { name: 'CalculoReservas.pdf', size: '3.7 MB' },
+          { name: 'ValidacionActuarial.pdf', size: '2.9 MB' }
+        ]
+      }
+    ],
+    'Caja Municipal': [
+      {
+        prefix: '202402',
+        name: 'Microfinanzas',
+        files: [
+          { name: 'InformeMicrofinanzas.pdf', size: '2.8 MB' },
+          { name: 'AnalisisRiesgo.pdf', size: '1.9 MB' }
+        ]
+      },
+      {
+        prefix: '202312',
+        name: 'Inclusión Financiera',
+        files: [
+          { name: 'ProgramaIncusion.pdf', size: '3.5 MB' },
+          { name: 'IndicadoresAcceso.xlsx', size: '756 KB' }
+        ]
+      }
+    ],
+    'Caja Rural': [
+      {
+        prefix: '202401',
+        name: 'Créditos Agrícolas',
+        files: [
+          { name: 'CreditosAgricolas.pdf', size: '2.6 MB' },
+          { name: 'AnalisisSectorial.pdf', size: '1.8 MB' }
+        ]
+      }
+    ],
+    'Empresa de Crédito': [
+      {
+        prefix: '202403',
+        name: 'Créditos de Consumo',
+        files: [
+          { name: 'CreditosConsumo.pdf', size: '3.1 MB' },
+          { name: 'ScoringCredito.pdf', size: '2.4 MB' }
+        ]
+      }
+    ],
+    'Fiduciaria': [
+      {
+        prefix: '202401',
+        name: 'Fideicomisos',
+        files: [
+          { name: 'InformeFideicomisos.pdf', size: '4.2 MB' },
+          { name: 'AdministracionPatrimonio.pdf', size: '3.1 MB' }
+        ]
+      }
+    ]
+  };
+
+  // Combinar plantillas base con específicas de la licencia
+  const allTemplates = [...baseTemplates];
+  if (licenseSpecificTemplates[license]) {
+    allTemplates.push(...licenseSpecificTemplates[license]);
+  }
+
+  // Generar carpetas con IDs únicos
+  return allTemplates.map((template, index) => ({
+    id: `${entityId}-folder-${index}`,
+    name: `${template.prefix} ${template.name}`,
+    files: template.files.map((file, fileIndex) => ({
+      id: `${entityId}-file-${index}-${fileIndex}`,
+      name: file.name,
+      size: file.size
+    }))
+  }));
 };
+
+// Generar datos simulados para todas las entidades
+const generateAllMockFolders = (): Record<string, FolderItem[]> => {
+  const mockData: Record<string, FolderItem[]> = {};
+  
+  const processNode = (node: TreeNode) => {
+    if (node.isEntity && node.license) {
+      mockData[node.id] = generateMockFoldersForEntity(node.id, node.name, node.license);
+    }
+    if (node.children) {
+      node.children.forEach(processNode);
+    }
+  };
+
+  financialSystemData.forEach(processNode);
+  return mockData;
+};
+
+export const mockFoldersData: Record<string, FolderItem[]> = generateAllMockFolders();
