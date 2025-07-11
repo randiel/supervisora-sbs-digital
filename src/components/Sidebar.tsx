@@ -67,7 +67,7 @@ export const Sidebar = ({ isOpen, onClose, user, onLogout }: SidebarProps) => {
               <div>
                 <div className="font-medium text-gray-900">{user.name}</div>
                 <div className="text-sm text-gray-600">{user.email}</div>
-                <div className="text-sm text-blue-600 font-medium">{user.role}</div>
+                <div className="text-sm text-blue-600 font-medium">Supervisor SBS</div>
               </div>
             </div>
           </div>

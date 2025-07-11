@@ -146,7 +146,7 @@ export const Dashboard = ({ user, onSelectApp, onLogout }: DashboardProps) => {
               />
               <div className="text-sm">
                 <div className="font-medium text-gray-900">{user.name}</div>
-                <div className="text-gray-500 text-xs">{user.role}</div>
+                <div className="text-gray-500 text-xs">Supervisor SBS</div>
               </div>
             </div>
           </div>
