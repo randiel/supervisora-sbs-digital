@@ -21,11 +21,18 @@ const Index = () => {
   const [selectedApp, setSelectedApp] = useState<Application | null>(null);
 
   const handleLogin = (email: string) => {
-    const name = email.split('@')[0].replace('.', ' ').replace(/\b\w/g, l => l.toUpperCase());
+    // Generar un nombre real desde el email
+    const emailUser = email.split('@')[0];
+    const name = emailUser.includes('.') 
+      ? emailUser.split('.').map(part => 
+          part.charAt(0).toUpperCase() + part.slice(1).toLowerCase()
+        ).join(' ')
+      : emailUser.charAt(0).toUpperCase() + emailUser.slice(1).toLowerCase();
+    
     setUser({
       email,
       name,
-      role: 'Supervisor'
+      role: 'Supervisor SBS'
     });
   };
 
