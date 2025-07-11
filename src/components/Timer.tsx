@@ -3,28 +3,27 @@ import { useState, useEffect } from 'react';
 import { Clock } from 'lucide-react';
 
 interface TimerProps {
-  targetDuration: number; // en minutos
+  targetDuration: number; // en segundos
   onComplete: () => void;
 }
 
 export const Timer = ({ targetDuration, onComplete }: TimerProps) => {
   const [timeElapsed, setTimeElapsed] = useState(0); // en segundos
-  const targetSeconds = targetDuration * 60;
 
   useEffect(() => {
     const interval = setInterval(() => {
       setTimeElapsed(prev => {
         const newTime = prev + 1;
-        if (newTime >= targetSeconds) {
+        if (newTime >= targetDuration) {
           onComplete();
-          return targetSeconds;
+          return targetDuration;
         }
         return newTime;
       });
     }, 1000);
 
     return () => clearInterval(interval);
-  }, [targetSeconds, onComplete]);
+  }, [targetDuration, onComplete]);
 
   const formatTime = (seconds: number) => {
     const mins = Math.floor(seconds / 60);
@@ -32,14 +31,14 @@ export const Timer = ({ targetDuration, onComplete }: TimerProps) => {
     return `${mins}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const progressPercentage = (timeElapsed / targetSeconds) * 100;
+  const progressPercentage = (timeElapsed / targetDuration) * 100;
 
   return (
     <div className="flex items-center space-x-2">
       <Clock className="h-3 w-3 text-blue-600" />
       <div className="flex items-center space-x-2">
         <span className="text-xs font-mono">
-          {formatTime(timeElapsed)} / {formatTime(targetSeconds)}
+          {formatTime(timeElapsed)} / {formatTime(targetDuration)}
         </span>
         <div className="w-16 h-1.5 bg-gray-200 rounded-full overflow-hidden">
           <div 

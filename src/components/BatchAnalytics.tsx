@@ -6,7 +6,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { ArrowLeft, Play, Download } from 'lucide-react';
 import { FinancialEntity } from './FinancialSystemTree/types';
 import { toast } from '@/hooks/use-toast';
-import { AdditionalParametersModal, AdditionalParameters } from './AdditionalParametersModal';
 import { Timer } from './Timer';
 
 interface BatchAnalyticsProps {
@@ -34,14 +33,13 @@ const MONTHS = [
 
 const YEARS = Array.from({ length: new Date().getFullYear() - 2021 }, (_, i) => 2022 + i);
 
-const ANALYSIS_DURATION_MIN = 5;
-const ANALYSIS_DURATION_MAX = 20;
+const ANALYSIS_DURATION_MIN = 10; // 10 seconds
+const ANALYSIS_DURATION_MAX = 60; // 60 seconds
 
 export const BatchAnalytics = ({ entity, onBack, onGoToAgent }: BatchAnalyticsProps) => {
   const [selectedMonth, setSelectedMonth] = useState<string>('');
   const [selectedYear, setSelectedYear] = useState<string>('');
   const [results, setResults] = useState<AnalysisResult[]>([]);
-  const [showParametersModal, setShowParametersModal] = useState(false);
 
   const generateResultFileName = (entityName: string, month: string, year: string): string => {
     return `${entityName.replace(/\s+/g, '_')}_${month}_${year}.zip`;
@@ -60,16 +58,13 @@ export const BatchAnalytics = ({ entity, onBack, onGoToAgent }: BatchAnalyticsPr
       });
       return;
     }
-    setShowParametersModal(true);
-  };
 
-  const handleParametersConfirm = (parameters: AdditionalParameters) => {
     const targetDuration = generateAnalysisDuration();
     
     const newResult: AnalysisResult = {
       id: Math.random().toString(36).substr(2, 9),
       supervisado: entity.name,
-      supervisor: 'Juan Pérez',
+      supervisor: 'Randiel Melgarejo',
       fechaLanzamiento: new Date(),
       duracion: 0,
       fechaCorte: `${selectedMonth}-${selectedYear}`,
@@ -210,13 +205,13 @@ export const BatchAnalytics = ({ entity, onBack, onGoToAgent }: BatchAnalyticsPr
                       {result.fechaLanzamiento.toLocaleString()}
                     </td>
                     <td className="p-3">
-                      {result.duracion > 0 ? `${result.duracion} min` : '-'}
+                      {result.duracion > 0 ? `${result.duracion} seg` : '-'}
                     </td>
                     <td className="p-3">{result.fechaCorte}</td>
                     <td className="p-3">
                       {result.estado === 'En Ejecución' ? (
                         <Timer 
-                          targetDuration={result.targetDuration || 5}
+                          targetDuration={result.targetDuration || 30}
                           onComplete={() => handleTimerComplete(result.id)}
                         />
                       ) : (
@@ -275,12 +270,6 @@ export const BatchAnalytics = ({ entity, onBack, onGoToAgent }: BatchAnalyticsPr
           {renderResultsTable()}
         </div>
       </div>
-
-      <AdditionalParametersModal
-        isOpen={showParametersModal}
-        onClose={() => setShowParametersModal(false)}
-        onConfirm={handleParametersConfirm}
-      />
     </div>
   );
 };
