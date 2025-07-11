@@ -7,7 +7,16 @@ import { SearchBar } from './FinancialSystemTree/SearchBar';
 
 export type { FinancialEntity } from './FinancialSystemTree/types';
 
-export const FinancialSystemTree = ({ onEntitySelect }: FinancialSystemTreeProps) => {
+interface ExtendedFinancialSystemTreeProps extends FinancialSystemTreeProps {
+  onFilesSelected?: (count: number) => void;
+  showFilesSelection?: boolean;
+}
+
+export const FinancialSystemTree = ({ 
+  onEntitySelect, 
+  onFilesSelected,
+  showFilesSelection = false 
+}: ExtendedFinancialSystemTreeProps) => {
   const {
     expandedNodes,
     selectedEntity,
@@ -26,6 +35,20 @@ export const FinancialSystemTree = ({ onEntitySelect }: FinancialSystemTreeProps
   const handleEntitySelect = (entity: FinancialEntity) => {
     setSelectedEntity(entity.id);
     onEntitySelect(entity);
+  };
+
+  const handleToggleFileSelection = (fileId: string) => {
+    toggleFileSelection(fileId);
+    if (onFilesSelected) {
+      // Calcular el nuevo count después del toggle
+      const newSelectedFiles = new Set(selectedFiles);
+      if (newSelectedFiles.has(fileId)) {
+        newSelectedFiles.delete(fileId);
+      } else {
+        newSelectedFiles.add(fileId);
+      }
+      onFilesSelected(newSelectedFiles.size);
+    }
   };
 
   const renderTree = () => {
@@ -49,7 +72,7 @@ export const FinancialSystemTree = ({ onEntitySelect }: FinancialSystemTreeProps
       <div className="bg-white rounded-lg border">
         <div className="p-3 border-b bg-gray-50 rounded-t-lg">
           <h3 className="text-sm font-semibold text-gray-900 mb-3">
-            Entidades del Sistema Financiero
+            {showFilesSelection ? "Entidades Supervisadas" : "Entidades del Sistema Financiero"}
           </h3>
           <SearchBar 
             searchTerm={searchTerm}
@@ -66,8 +89,9 @@ export const FinancialSystemTree = ({ onEntitySelect }: FinancialSystemTreeProps
         expandedFolders={expandedFolders}
         selectedFiles={selectedFiles}
         onToggleFolder={toggleFolder}
-        onToggleFileSelection={toggleFileSelection}
+        onToggleFileSelection={handleToggleFileSelection}
         findEntityById={findEntityById}
+        showFilesSelection={showFilesSelection}
       />
     </div>
   );

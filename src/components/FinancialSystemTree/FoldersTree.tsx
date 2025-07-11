@@ -13,6 +13,7 @@ interface FoldersTreeProps {
   onToggleFolder: (folderId: string) => void;
   onToggleFileSelection: (fileId: string) => void;
   findEntityById: (entityId: string) => TreeNode | null;
+  showFilesSelection?: boolean;
 }
 
 export const FoldersTree = ({
@@ -21,7 +22,8 @@ export const FoldersTree = ({
   selectedFiles,
   onToggleFolder,
   onToggleFileSelection,
-  findEntityById
+  findEntityById,
+  showFilesSelection = false
 }: FoldersTreeProps) => {
   if (!selectedEntity) return null;
 
@@ -84,14 +86,16 @@ export const FoldersTree = ({
                     className={`flex items-center py-1 px-2 rounded cursor-pointer hover:bg-gray-100 ${
                       selectedFiles.has(file.id) ? 'bg-blue-50 border border-blue-200' : ''
                     }`}
-                    onClick={() => onToggleFileSelection(file.id)}
+                    onClick={() => showFilesSelection && onToggleFileSelection(file.id)}
                   >
                     <div className="flex items-center space-x-2 flex-1">
                       <div className="w-4" />
-                      {selectedFiles.has(file.id) ? (
-                        <CheckCircle className="h-4 w-4 text-blue-600" />
-                      ) : (
-                        <div className="w-4 h-4 border border-gray-300 rounded" />
+                      {showFilesSelection && (
+                        selectedFiles.has(file.id) ? (
+                          <CheckCircle className="h-4 w-4 text-blue-600" />
+                        ) : (
+                          <div className="w-4 h-4 border border-gray-300 rounded" />
+                        )
                       )}
                       <File className="h-4 w-4 text-gray-500" />
                       <div className="flex-1">
@@ -108,7 +112,7 @@ export const FoldersTree = ({
           </div>
         ))}
       </div>
-      {selectedFiles.size > 0 && (
+      {showFilesSelection && selectedFiles.size > 0 && (
         <div className="p-3 border-t bg-gray-50 flex items-center justify-between">
           <p className="text-sm text-gray-600">
             {selectedFiles.size} archivo{selectedFiles.size !== 1 ? 's' : ''} seleccionado{selectedFiles.size !== 1 ? 's' : ''}

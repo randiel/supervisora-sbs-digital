@@ -6,6 +6,7 @@ import { FinancialSystemTree, FinancialEntity } from './FinancialSystemTree';
 import { DocumentUpload } from './DocumentUpload';
 import { BatchAnalytics } from './BatchAnalytics';
 import { SupervisorAgent } from './SupervisorAgent';
+import { DocumentSearchChat } from './DocumentSearchChat';
 
 interface ApplicationWindowProps {
   application: Application;
@@ -19,9 +20,14 @@ export const ApplicationWindow = ({ application, user, onBack }: ApplicationWind
   const [selectedEntity, setSelectedEntity] = useState<FinancialEntity | null>(null);
   const [activeSection, setActiveSection] = useState<ActiveSection>('main');
   const [hasUploadedFiles, setHasUploadedFiles] = useState(false);
+  const [selectedFilesCount, setSelectedFilesCount] = useState(0);
 
   const handleEntitySelect = (entity: FinancialEntity) => {
     setSelectedEntity(entity);
+  };
+
+  const handleFilesSelected = (count: number) => {
+    setSelectedFilesCount(count);
   };
 
   const handleDocumentUpload = () => {
@@ -43,64 +49,86 @@ export const ApplicationWindow = ({ application, user, onBack }: ApplicationWind
     setActiveSection('main');
   };
 
-  const renderMainContent = () => (
-    <div className="flex h-full">
-      <div className="flex-1 p-6">
-        <div className="text-center py-12">
-          <h3 className="text-xl font-semibold text-gray-900 mb-4">
-            Seleccione una entidad del sistema financiero
-          </h3>
-          <p className="text-gray-600">
-            Elija una entidad del árbol para comenzar el proceso de supervisión
-          </p>
+  const renderMainContent = () => {
+    const isBusquedaDocumental = application.id === 'busqueda-documental';
+    const showChat = isBusquedaDocumental && selectedEntity && selectedFilesCount > 0;
+
+    return (
+      <div className="flex h-full">
+        <div className="flex-1 p-6">
+          {showChat ? (
+            <DocumentSearchChat 
+              entity={selectedEntity}
+              selectedFilesCount={selectedFilesCount}
+            />
+          ) : (
+            <div className="text-center py-12">
+              <h3 className="text-xl font-semibold text-gray-900 mb-4">
+                {isBusquedaDocumental 
+                  ? "Seleccione una entidad del sistema financiero"
+                  : "Seleccione una entidad del sistema financiero"
+                }
+              </h3>
+              <p className="text-gray-600">
+                {isBusquedaDocumental
+                  ? "Elija una entidad del sistema financiera, el periodo (o cargue uno nuevo) para comenzar el proceso de supervisión."
+                  : "Elija una entidad del árbol para comenzar el proceso de supervisión"
+                }
+              </p>
+            </div>
+          )}
+        </div>
+        
+        <div className="w-96 border-l bg-gray-50 p-4 overflow-y-auto">
+          <FinancialSystemTree 
+            onEntitySelect={handleEntitySelect}
+            onFilesSelected={isBusquedaDocumental ? handleFilesSelected : undefined}
+            showFilesSelection={isBusquedaDocumental}
+          />
+          
+          {selectedEntity && (
+            <div className="mt-6 space-y-3">
+              <div className="bg-white p-3 rounded-lg border">
+                <div className="text-sm font-medium text-gray-900">
+                  {selectedEntity.name}
+                </div>
+                <div className="text-xs text-gray-500">
+                  {selectedEntity.license}
+                </div>
+              </div>
+              
+              <div className="space-y-2">
+                <Button
+                  onClick={handleDocumentUpload}
+                  className="w-full bg-primary hover:bg-primary/90"
+                >
+                  Carga Documental
+                </Button>
+                
+                <Button
+                  onClick={handleBatchAnalytics}
+                  disabled={!hasUploadedFiles}
+                  variant={hasUploadedFiles ? "default" : "secondary"}
+                  className="w-full"
+                >
+                  Analítica Batch
+                </Button>
+                
+                <Button
+                  onClick={handleSupervisorAgent}
+                  disabled={!hasUploadedFiles}
+                  variant={hasUploadedFiles ? "default" : "secondary"}
+                  className="w-full"
+                >
+                  Agente Suptech
+                </Button>
+              </div>
+            </div>
+          )}
         </div>
       </div>
-      
-      <div className="w-96 border-l bg-gray-50 p-4 overflow-y-auto">
-        <FinancialSystemTree onEntitySelect={handleEntitySelect} />
-        
-        {selectedEntity && (
-          <div className="mt-6 space-y-3">
-            <div className="bg-white p-3 rounded-lg border">
-              <div className="text-sm font-medium text-gray-900">
-                {selectedEntity.name}
-              </div>
-              <div className="text-xs text-gray-500">
-                {selectedEntity.license}
-              </div>
-            </div>
-            
-            <div className="space-y-2">
-              <Button
-                onClick={handleDocumentUpload}
-                className="w-full bg-primary hover:bg-primary/90"
-              >
-                Carga Documental
-              </Button>
-              
-              <Button
-                onClick={handleBatchAnalytics}
-                disabled={!hasUploadedFiles}
-                variant={hasUploadedFiles ? "default" : "secondary"}
-                className="w-full"
-              >
-                Analítica Batch
-              </Button>
-              
-              <Button
-                onClick={handleSupervisorAgent}
-                disabled={!hasUploadedFiles}
-                variant={hasUploadedFiles ? "default" : "secondary"}
-                className="w-full"
-              >
-                Agente Suptech
-              </Button>
-            </div>
-          </div>
-        )}
-      </div>
-    </div>
-  );
+    );
+  };
 
   const renderContent = () => {
     switch (activeSection) {
