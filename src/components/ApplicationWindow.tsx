@@ -189,7 +189,7 @@ export const ApplicationWindow = ({ application, user, onBack }: ApplicationWind
           <div className="flex items-center space-x-2 text-sm text-gray-600">
             <span>{user.name}</span>
             <span>•</span>
-            <span>{user.role}</span>
+            <span>Supervisor SBS</span>
           </div>
         </div>
       </header>
