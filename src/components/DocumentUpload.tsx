@@ -127,16 +127,16 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
       description: `${uploadedFile.name} se ha cargado con hash ${uploadedFile.hash}`,
     });
 
+    // Limpiar estado
     setPendingFile(null);
+    setShowMetadataModal(false);
     onFilesUploaded();
   };
 
   const handleMetadataModalClose = () => {
+    // Solo cerrar el modal sin procesar el archivo
     setShowMetadataModal(false);
-    // Si el usuario cierra el modal sin guardar, aún procesamos el archivo sin metadatos
-    if (pendingFile) {
-      handleMetadataSave('');
-    }
+    setPendingFile(null);
   };
 
   const addNewDataset = () => {
@@ -160,6 +160,29 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
 
   const getFileIcon = (type: string) => {
     return <FileText className="h-8 w-8 text-blue-600" />;
+  };
+
+  const formatFileSize = (bytes: number): string => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + ' ' + sizes[i];
+  };
+
+  const getFileTypeLabel = (type: string): string => {
+    switch (type) {
+      case 'application/pdf':
+        return 'Documento PDF';
+      case 'application/msword':
+        return 'Documento Word';
+      case 'application/vnd.openxmlformats-officedocument.wordprocessingml.document':
+        return 'Documento Word';
+      case 'text/plain':
+        return 'Archivo de Texto';
+      default:
+        return 'Documento';
+    }
   };
 
   if (selectedDataset) {
@@ -225,7 +248,7 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
                         {file.name}
                       </p>
                       <p className="text-xs text-gray-500 mt-1">
-                        {(file.size / 1024).toFixed(1)} KB
+                        {formatFileSize(file.size)}
                       </p>
                       <p className="text-xs text-blue-600 font-mono mt-1">
                         {file.hash}
@@ -245,7 +268,7 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
           {previewFile && (
             <div className="w-1/2 border-l bg-gray-50 p-6">
               <div className="flex items-center justify-between mb-4">
-                <h3 className="text-lg font-semibold">Previsualización</h3>
+                <h3 className="text-lg font-semibold">Información del Archivo</h3>
                 <Button
                   variant="ghost"
                   size="sm"
@@ -255,24 +278,59 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
                 </Button>
               </div>
               
-              <div className="bg-white rounded-lg border p-6 h-96 flex flex-col">
-                <div className="text-center flex-shrink-0">
+              <div className="bg-white rounded-lg border p-6 space-y-4">
+                <div className="text-center">
                   {getFileIcon(previewFile.type)}
-                  <p className="mt-4 font-medium">{previewFile.name}</p>
-                  <p className="text-sm text-gray-500 mt-2">
-                    Código: {previewFile.hash}
-                  </p>
-                  <p className="text-xs text-gray-400 mt-1">
-                    Subido: {previewFile.uploadDate.toLocaleString()}
-                  </p>
+                  <p className="mt-4 font-medium text-lg">{previewFile.name}</p>
+                </div>
+                
+                <div className="space-y-3">
+                  <div className="flex justify-between items-center py-2 border-b">
+                    <span className="text-sm font-medium text-gray-600">Tipo:</span>
+                    <span className="text-sm text-gray-900">{getFileTypeLabel(previewFile.type)}</span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center py-2 border-b">
+                    <span className="text-sm font-medium text-gray-600">Tamaño:</span>
+                    <span className="text-sm text-gray-900">{formatFileSize(previewFile.size)}</span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center py-2 border-b">
+                    <span className="text-sm font-medium text-gray-600">Código Hash:</span>
+                    <span className="text-sm text-blue-600 font-mono">{previewFile.hash}</span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center py-2 border-b">
+                    <span className="text-sm font-medium text-gray-600">Fecha de Carga:</span>
+                    <span className="text-sm text-gray-900">
+                      {previewFile.uploadDate.toLocaleDateString('es-ES', {
+                        year: 'numeric',
+                        month: 'long',
+                        day: 'numeric',
+                        hour: '2-digit',
+                        minute: '2-digit'
+                      })}
+                    </span>
+                  </div>
+                  
+                  <div className="flex justify-between items-center py-2">
+                    <span className="text-sm font-medium text-gray-600">Estado:</span>
+                    <span className={`text-sm px-2 py-1 rounded ${
+                      previewFile.metadata 
+                        ? 'bg-green-100 text-green-800' 
+                        : 'bg-gray-100 text-gray-800'
+                    }`}>
+                      {previewFile.metadata ? 'Con metadatos' : 'Sin metadatos'}
+                    </span>
+                  </div>
                 </div>
                 
                 {previewFile.metadata && (
-                  <div className="mt-6 flex-1">
+                  <div className="mt-6">
                     <h4 className="text-sm font-semibold text-gray-900 mb-2">
                       Metadatos del Documento:
                     </h4>
-                    <div className="bg-gray-50 p-3 rounded-lg text-sm text-gray-700 overflow-y-auto max-h-32">
+                    <div className="bg-gray-50 p-3 rounded-lg text-sm text-gray-700 max-h-32 overflow-y-auto">
                       {previewFile.metadata}
                     </div>
                   </div>
