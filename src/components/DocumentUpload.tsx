@@ -1,7 +1,10 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent } from '@/components/ui/card';
-import { ArrowLeft, Upload, Plus, FileText, X, Eye } from 'lucide-react';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { ArrowLeft, Upload, Plus, FileText, X, Filter } from 'lucide-react';
 import { FinancialEntity } from './FinancialSystemTree/types';
 import { Application } from '@/pages/Index';
 import { toast } from '@/hooks/use-toast';
@@ -27,7 +30,14 @@ interface UploadedFile {
   size: number;
   hash: string;
   uploadDate: Date;
-  metadata?: string;
+  metadata?: Record<string, string>;
+}
+
+interface Folder {
+  id: string;
+  name: string;
+  period: string; // formato: YYYYMM
+  files: UploadedFile[];
 }
 
 interface PendingFile {
@@ -36,35 +46,40 @@ interface PendingFile {
   datasetId: string;
 }
 
-const getDefaultDatasets = (applicationId: string): Dataset[] => {
-  switch (applicationId) {
-    case 'garantias-preferidas':
-      return [
-        { id: 'tasaciones', name: 'Tasaciones', files: [] },
-        { id: 'polizas', name: 'Pólizas', files: [] },
-        { id: 'inscripciones', name: 'Inscripciones', files: [] }
-      ];
-    case 'busqueda-documental':
-      return [
-        { id: 'informes-tecnicos', name: 'Informes Técnicos SBS', files: [] },
-        { id: 'informes-auditoria', name: 'Informes de Auditoría', files: [] },
-        { id: 'informes-seguimiento', name: 'Informes de Seguimiento y Recomendaciones', files: [] }
-      ];
-    default:
-      return [
-        { id: 'informes-tecnicos', name: 'Informes Técnicos SBS', files: [] },
-        { id: 'informes-auditoria', name: 'Informes de Auditoría', files: [] },
-        { id: 'informes-seguimiento', name: 'Informes de Seguimiento y Recomendaciones', files: [] }
-      ];
-  }
+// Datos de ejemplo para las carpetas por entidad
+const getEntityFolders = (entityId: string): Folder[] => {
+  const foldersByEntity: Record<string, Folder[]> = {
+    'integra': [
+      { id: '1', name: 'Auditoría Integral', period: '202401', files: [] },
+      { id: '2', name: 'Estados Financieros', period: '202312', files: [] },
+      { id: '3', name: 'Gestión de Riesgos', period: '202403', files: [] },
+      { id: '4', name: 'Gestión de Fondos', period: '202401', files: [] },
+      { id: '5', name: 'Aportes y Beneficios', period: '202312', files: [] },
+      { id: '6', name: 'Inversiones', period: '202402', files: [] },
+      { id: '7', name: 'Compliance', period: '202404', files: [] }
+    ],
+    'prima': [
+      { id: '8', name: 'Auditoría Integral', period: '202401', files: [] },
+      { id: '9', name: 'Estados Financieros', period: '202403', files: [] },
+      { id: '10', name: 'Gestión de Riesgos', period: '202402', files: [] },
+      { id: '11', name: 'Provisiones Técnicas', period: '202401', files: [] },
+      { id: '12', name: 'Solvencia', period: '202312', files: [] }
+    ]
+  };
+  
+  return foldersByEntity[entityId] || [];
 };
 
 export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }: DocumentUploadProps) => {
-  const [datasets, setDatasets] = useState<Dataset[]>(() => getDefaultDatasets(application.id));
-  const [selectedDataset, setSelectedDataset] = useState<string | null>(null);
+  const [folders, setFolders] = useState<Folder[]>(() => getEntityFolders(entity.id));
+  const [selectedFolder, setSelectedFolder] = useState<string | null>(null);
   const [previewFile, setPreviewFile] = useState<UploadedFile | null>(null);
-  const [newDatasetName, setNewDatasetName] = useState('');
-  const [showNewDatasetForm, setShowNewDatasetForm] = useState(false);
+  const [selectedYear, setSelectedYear] = useState<string>('2024');
+  const [selectedMonth, setSelectedMonth] = useState<string>('01');
+  const [showNewFolderForm, setShowNewFolderForm] = useState(false);
+  const [newFolderName, setNewFolderName] = useState('');
+  const [newFolderYear, setNewFolderYear] = useState('2024');
+  const [newFolderMonth, setNewFolderMonth] = useState('01');
   const [pendingFile, setPendingFile] = useState<PendingFile | null>(null);
   const [showMetadataModal, setShowMetadataModal] = useState(false);
 
@@ -76,7 +91,7 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
     return `SBS-${nameHash.toString(16).toUpperCase()}-${randomComponent.toUpperCase()}-${timestamp.slice(-4)}`;
   };
 
-  const handleFileUpload = (datasetId: string, files: FileList) => {
+  const handleFileUpload = (folderId: string, files: FileList) => {
     const allowedTypes = ['application/pdf', 'application/msword', 
                          'application/vnd.openxmlformats-officedocument.wordprocessingml.document', 
                          'text/plain'];
@@ -97,13 +112,13 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
       setPendingFile({
         file,
         hash,
-        datasetId
+        datasetId: folderId
       });
       setShowMetadataModal(true);
     });
   };
 
-  const handleMetadataSave = (metadata: string) => {
+  const handleMetadataSave = (metadata: Record<string, string>) => {
     if (!pendingFile) return;
 
     const uploadedFile: UploadedFile = {
@@ -113,13 +128,13 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
       size: pendingFile.file.size,
       hash: pendingFile.hash,
       uploadDate: new Date(),
-      metadata: metadata || undefined
+      metadata: Object.keys(metadata).length > 0 ? metadata : undefined
     };
 
-    setDatasets(prev => prev.map(dataset => 
-      dataset.id === pendingFile.datasetId 
-        ? { ...dataset, files: [...dataset.files, uploadedFile] }
-        : dataset
+    setFolders(prev => prev.map(folder => 
+      folder.id === pendingFile.datasetId 
+        ? { ...folder, files: [...folder.files, uploadedFile] }
+        : folder
     ));
 
     toast({
@@ -139,24 +154,52 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
     setPendingFile(null);
   };
 
-  const addNewDataset = () => {
-    if (!newDatasetName.trim()) return;
+  const addNewFolder = () => {
+    if (!newFolderName.trim()) return;
     
-    const newDataset: Dataset = {
+    const period = `${newFolderYear}${newFolderMonth.padStart(2, '0')}`;
+    const newFolder: Folder = {
       id: `custom-${Date.now()}`,
-      name: newDatasetName,
+      name: newFolderName,
+      period,
       files: []
     };
     
-    setDatasets(prev => [...prev, newDataset]);
-    setNewDatasetName('');
-    setShowNewDatasetForm(false);
+    setFolders(prev => [...prev, newFolder]);
+    setNewFolderName('');
+    setNewFolderYear('2024');
+    setNewFolderMonth('01');
+    setShowNewFolderForm(false);
     
     toast({
       title: "Carpeta creada",
-      description: `Se ha creado la carpeta: ${newDatasetName}`
+      description: `Se ha creado la carpeta: ${newFolderName} (${period})`
     });
   };
+
+  // Filtrar carpetas por año y mes
+  const filteredFolders = folders.filter(folder => {
+    const folderYear = folder.period.substring(0, 4);
+    const folderMonth = folder.period.substring(4, 6);
+    return folderYear === selectedYear && folderMonth === selectedMonth.padStart(2, '0');
+  });
+
+  // Generar arrays para los selectores
+  const availableYears = ['2022', '2023', '2024', '2025'];
+  const availableMonths = [
+    { value: '01', label: 'Enero' },
+    { value: '02', label: 'Febrero' },
+    { value: '03', label: 'Marzo' },
+    { value: '04', label: 'Abril' },
+    { value: '05', label: 'Mayo' },
+    { value: '06', label: 'Junio' },
+    { value: '07', label: 'Julio' },
+    { value: '08', label: 'Agosto' },
+    { value: '09', label: 'Septiembre' },
+    { value: '10', label: 'Octubre' },
+    { value: '11', label: 'Noviembre' },
+    { value: '12', label: 'Diciembre' }
+  ];
 
   const getFileIcon = (type: string) => {
     return <FileText className="h-8 w-8 text-blue-600" />;
@@ -185,9 +228,9 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
     }
   };
 
-  if (selectedDataset) {
-    const dataset = datasets.find(d => d.id === selectedDataset);
-    if (!dataset) return null;
+  if (selectedFolder) {
+    const folder = folders.find(f => f.id === selectedFolder);
+    if (!folder) return null;
 
     return (
       <>
@@ -196,7 +239,7 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
             <div className="mb-6">
               <Button
                 variant="ghost"
-                onClick={() => setSelectedDataset(null)}
+                onClick={() => setSelectedFolder(null)}
                 className="mb-4"
               >
                 <ArrowLeft className="h-4 w-4 mr-2" />
@@ -204,7 +247,7 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
               </Button>
               
               <h2 className="text-2xl font-bold text-gray-900 mb-2">
-                Carga de Archivos - {dataset.name}
+                Carga de Archivos - {folder.name}
               </h2>
               <p className="text-gray-600">
                 {entity.name} - {entity.license}
@@ -218,7 +261,7 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
                 accept=".pdf,.doc,.docx,.txt"
                 onChange={(e) => {
                   if (e.target.files) {
-                    handleFileUpload(selectedDataset, e.target.files);
+                    handleFileUpload(selectedFolder, e.target.files);
                   }
                 }}
                 className="hidden"
@@ -235,7 +278,7 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-              {dataset.files.map(file => (
+              {folder.files.map(file => (
                 <Card 
                   key={file.id} 
                   className="cursor-pointer hover:shadow-md transition-shadow"
@@ -255,7 +298,7 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
                       </p>
                       {file.metadata && (
                         <div className="mt-2 px-2 py-1 bg-green-50 rounded text-xs text-green-700">
-                          Con metadatos
+                          {Object.keys(file.metadata).length} metadatos
                         </div>
                       )}
                     </div>
@@ -330,8 +373,13 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
                     <h4 className="text-sm font-semibold text-gray-900 mb-2">
                       Metadatos del Documento:
                     </h4>
-                    <div className="bg-gray-50 p-3 rounded-lg text-sm text-gray-700 max-h-32 overflow-y-auto">
-                      {previewFile.metadata}
+                    <div className="bg-gray-50 p-3 rounded-lg space-y-2 max-h-32 overflow-y-auto">
+                      {Object.entries(previewFile.metadata).map(([key, value]) => (
+                        <div key={key} className="text-sm">
+                          <span className="font-medium text-gray-700">{key}:</span>{' '}
+                          <span className="text-gray-600">{value}</span>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 )}
@@ -367,27 +415,65 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
             Carga Documental
           </h2>
-          <p className="text-gray-600">
+          <p className="text-gray-600 mb-6">
             {entity.name} - {entity.license}
           </p>
+          
+          {/* Filtros de Período */}
+          <div className="bg-gray-50 p-4 rounded-lg mb-6">
+            <div className="flex items-center gap-2 mb-4">
+              <Filter className="h-5 w-5 text-gray-600" />
+              <h3 className="font-semibold text-gray-900">Filtros de Período</h3>
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <Label htmlFor="year-select">Año</Label>
+                <Select value={selectedYear} onValueChange={setSelectedYear}>
+                  <SelectTrigger id="year-select">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableYears.map(year => (
+                      <SelectItem key={year} value={year}>{year}</SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+              <div>
+                <Label htmlFor="month-select">Mes</Label>
+                <Select value={selectedMonth} onValueChange={setSelectedMonth}>
+                  <SelectTrigger id="month-select">
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {availableMonths.map(month => (
+                      <SelectItem key={month.value} value={month.value}>
+                        {month.label}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </div>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-          {datasets.map(dataset => (
+          {filteredFolders.map(folder => (
             <Card 
-              key={dataset.id}
+              key={folder.id}
               className="cursor-pointer hover:shadow-lg transition-shadow"
-              onClick={() => setSelectedDataset(dataset.id)}
+              onClick={() => setSelectedFolder(folder.id)}
             >
               <CardContent className="p-6 text-center">
                 <div className="w-16 h-16 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-4">
                   <FileText className="h-8 w-8 text-blue-600" />
                 </div>
                 <h3 className="font-semibold text-gray-900 mb-2">
-                  {dataset.name}
+                  {folder.name}
                 </h3>
                 <p className="text-sm text-gray-500">
-                  {dataset.files.length} archivo{dataset.files.length !== 1 ? 's' : ''}
+                  {folder.files.length} archivo{folder.files.length !== 1 ? 's' : ''}
                 </p>
               </CardContent>
             </Card>
@@ -395,7 +481,7 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
 
           <Card 
             className="cursor-pointer hover:shadow-lg transition-shadow border-dashed border-2 border-gray-300"
-            onClick={() => setShowNewDatasetForm(true)}
+            onClick={() => setShowNewFolderForm(true)}
           >
             <CardContent className="p-6 text-center">
               <div className="w-16 h-16 bg-gray-100 rounded-lg flex items-center justify-center mx-auto mb-4">
@@ -411,26 +497,66 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
           </Card>
         </div>
 
-        {showNewDatasetForm && (
-          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center">
+        {showNewFolderForm && (
+          <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
             <div className="bg-white rounded-lg p-6 w-96">
               <h3 className="text-lg font-semibold mb-4">Nueva Carpeta</h3>
-              <input
-                type="text"
-                placeholder="Nombre de la carpeta"
-                value={newDatasetName}
-                onChange={(e) => setNewDatasetName(e.target.value)}
-                className="w-full p-2 border rounded mb-4"
-              />
-              <div className="flex space-x-2">
-                <Button onClick={addNewDataset} className="flex-1">
+              
+              <div className="space-y-4">
+                <div>
+                  <Label htmlFor="folder-name">Nombre de la carpeta</Label>
+                  <Input
+                    id="folder-name"
+                    placeholder="Ej: Auditoría Integral"
+                    value={newFolderName}
+                    onChange={(e) => setNewFolderName(e.target.value)}
+                  />
+                </div>
+                
+                <div className="grid grid-cols-2 gap-4">
+                  <div>
+                    <Label htmlFor="folder-year">Año</Label>
+                    <Select value={newFolderYear} onValueChange={setNewFolderYear}>
+                      <SelectTrigger id="folder-year">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {availableYears.map(year => (
+                          <SelectItem key={year} value={year}>{year}</SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                  
+                  <div>
+                    <Label htmlFor="folder-month">Mes</Label>
+                    <Select value={newFolderMonth} onValueChange={setNewFolderMonth}>
+                      <SelectTrigger id="folder-month">
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        {availableMonths.map(month => (
+                          <SelectItem key={month.value} value={month.value}>
+                            {month.label}
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                  </div>
+                </div>
+              </div>
+              
+              <div className="flex space-x-2 mt-6">
+                <Button onClick={addNewFolder} className="flex-1">
                   Crear
                 </Button>
                 <Button 
                   variant="outline" 
                   onClick={() => {
-                    setShowNewDatasetForm(false);
-                    setNewDatasetName('');
+                    setShowNewFolderForm(false);
+                    setNewFolderName('');
+                    setNewFolderYear('2024');
+                    setNewFolderMonth('01');
                   }}
                   className="flex-1"
                 >

@@ -2,29 +2,65 @@
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from '@/components/ui/dialog';
-import { Textarea } from '@/components/ui/textarea';
+import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
-import { FileText } from 'lucide-react';
+import { FileText, Plus, X } from 'lucide-react';
 
 interface FileMetadataModalProps {
   isOpen: boolean;
   onClose: () => void;
-  onSave: (metadata: string) => void;
+  onSave: (metadata: Record<string, string>) => void;
   fileName: string;
   fileHash: string;
 }
 
+interface KeyValuePair {
+  id: string;
+  key: string;
+  value: string;
+}
+
 export const FileMetadataModal = ({ isOpen, onClose, onSave, fileName, fileHash }: FileMetadataModalProps) => {
-  const [metadata, setMetadata] = useState('');
+  const [keyValuePairs, setKeyValuePairs] = useState<KeyValuePair[]>([
+    { id: '1', key: '', value: '' }
+  ]);
+
+  const addKeyValuePair = () => {
+    const newPair: KeyValuePair = {
+      id: Date.now().toString(),
+      key: '',
+      value: ''
+    };
+    setKeyValuePairs([...keyValuePairs, newPair]);
+  };
+
+  const removeKeyValuePair = (id: string) => {
+    if (keyValuePairs.length > 1) {
+      setKeyValuePairs(keyValuePairs.filter(pair => pair.id !== id));
+    }
+  };
+
+  const updateKeyValuePair = (id: string, field: 'key' | 'value', newValue: string) => {
+    setKeyValuePairs(keyValuePairs.map(pair => 
+      pair.id === id ? { ...pair, [field]: newValue } : pair
+    ));
+  };
 
   const handleSave = () => {
+    const metadata = keyValuePairs.reduce((acc, pair) => {
+      if (pair.key.trim() && pair.value.trim()) {
+        acc[pair.key.trim()] = pair.value.trim();
+      }
+      return acc;
+    }, {} as Record<string, string>);
+    
     onSave(metadata);
-    setMetadata('');
+    setKeyValuePairs([{ id: '1', key: '', value: '' }]);
     onClose();
   };
 
   const handleCancel = () => {
-    setMetadata('');
+    setKeyValuePairs([{ id: '1', key: '', value: '' }]);
     onClose();
   };
 
@@ -51,20 +87,53 @@ export const FileMetadataModal = ({ isOpen, onClose, onSave, fileName, fileHash 
             </div>
           </div>
           
-          <div className="space-y-2">
-            <Label htmlFor="metadata">
-              Descripción y contexto del documento
-            </Label>
-            <Textarea
-              id="metadata"
-              placeholder="Ej: Informe de auditoría Q3 2024, contiene observaciones sobre gestión de riesgos crediticios y recomendaciones de mejora para el área de compliance..."
-              value={metadata}
-              onChange={(e) => setMetadata(e.target.value)}
-              rows={4}
-              className="resize-none"
-            />
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <Label>Metadatos (Clave - Valor)</Label>
+              <Button
+                type="button"
+                variant="outline"
+                size="sm"
+                onClick={addKeyValuePair}
+                className="text-xs"
+              >
+                <Plus className="h-3 w-3 mr-1" />
+                Agregar
+              </Button>
+            </div>
+            
+            <div className="space-y-3 max-h-60 overflow-y-auto">
+              {keyValuePairs.map((pair, index) => (
+                <div key={pair.id} className="flex gap-2 items-center">
+                  <Input
+                    placeholder="Clave"
+                    value={pair.key}
+                    onChange={(e) => updateKeyValuePair(pair.id, 'key', e.target.value)}
+                    className="flex-1"
+                  />
+                  <Input
+                    placeholder="Valor"
+                    value={pair.value}
+                    onChange={(e) => updateKeyValuePair(pair.id, 'value', e.target.value)}
+                    className="flex-1"
+                  />
+                  {keyValuePairs.length > 1 && (
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeKeyValuePair(pair.id)}
+                      className="px-2"
+                    >
+                      <X className="h-4 w-4" />
+                    </Button>
+                  )}
+                </div>
+              ))}
+            </div>
+            
             <div className="text-xs text-gray-500">
-              Esta información ayudará al agente supervisorio a contextualizar el documento
+              Ejemplo: Tipo → "Informe de Auditoría", Periodo → "Q3 2024", Área → "Gestión de Riesgos"
             </div>
           </div>
         </div>
