@@ -185,10 +185,9 @@ export const financialSystemData: TreeNode[] = [
       },
       {
         id: 'dcb',
-        name: 'DCB',
-        tooltip: 'Derrama y Caja de Beneficios',
+        name: 'Derrama y Caja de Beneficios',
         children: [
-          { id: 'caja-militar-policia', name: 'Caja Militar Policia', isEntity: true, license: 'DCB' }
+          { id: 'caja-militar-policial', name: 'Caja Militar Policial', isEntity: true, license: 'DCB' }
         ]
       }
     ]

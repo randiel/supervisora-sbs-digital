@@ -22,7 +22,7 @@ const TRANSVERSAL_APPLICATIONS: Application[] = [
   {
     id: 'busqueda-documental',
     name: 'Búsqueda Documental',
-    description: 'Sistema de gestión y búsqueda de documentos regulatorios'
+    description: 'Sistema de gestión y búsqueda de documentos'
   }
 ];
 

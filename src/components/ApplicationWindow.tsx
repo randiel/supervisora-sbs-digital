@@ -65,13 +65,13 @@ export const ApplicationWindow = ({ application, user, onBack }: ApplicationWind
             <div className="text-center py-12">
               <h3 className="text-xl font-semibold text-gray-900 mb-4">
                 {isBusquedaDocumental 
-                  ? "Seleccione una entidad del sistema financiero"
-                  : "Seleccione una entidad del sistema financiero"
+                  ? "Seleccione una entidad supervisada"
+                  : "Seleccione una entidad supervisada"
                 }
               </h3>
               <p className="text-gray-600">
                 {isBusquedaDocumental
-                  ? "Elija una entidad del sistema financiera, el periodo (o cargue uno nuevo) para comenzar el proceso de supervisión."
+                  ? "Elija una entidad supervisada, periodo y documento para iniciar la búsqueda documental."
                   : "Elija una entidad del árbol para comenzar el proceso de supervisión"
                 }
               </p>
@@ -111,16 +111,7 @@ export const ApplicationWindow = ({ application, user, onBack }: ApplicationWind
                   variant={hasUploadedFiles ? "default" : "secondary"}
                   className="w-full"
                 >
-                  Analítica Batch
-                </Button>
-                
-                <Button
-                  onClick={handleSupervisorAgent}
-                  disabled={!hasUploadedFiles}
-                  variant={hasUploadedFiles ? "default" : "secondary"}
-                  className="w-full"
-                >
-                  Agente Suptech
+                  Cargar Contexto
                 </Button>
               </div>
             </div>
