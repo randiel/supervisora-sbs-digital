@@ -5,11 +5,12 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { ArrowLeft, Upload, Plus, FileText, X, Filter, CheckCircle2 } from 'lucide-react';
+import { ArrowLeft, Upload, Plus, FileText, X, Filter, CheckCircle2, Eye } from 'lucide-react';
 import { FinancialEntity } from './FinancialSystemTree/types';
 import { Application } from '@/pages/Index';
 import { toast } from '@/hooks/use-toast';
 import { FileMetadataModal } from './FileMetadataModal';
+import { FilePreviewModal } from './FilePreviewModal';
 
 interface DocumentUploadProps {
   entity: FinancialEntity;
@@ -88,6 +89,8 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
   const [completedFiles, setCompletedFiles] = useState<Set<string>>(new Set());
   const [isLoadingComplete, setIsLoadingComplete] = useState(false);
   const [showConfirmationModal, setShowConfirmationModal] = useState(false);
+  const [showPreviewModal, setShowPreviewModal] = useState(false);
+  const [previewFileData, setPreviewFileData] = useState<UploadedFile | null>(null);
 
   const generateFileHash = (fileName: string): string => {
     // Generar un hash más realista basado en el nombre del archivo y timestamp
@@ -343,6 +346,11 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
     }
   };
 
+  const handlePreviewFile = (file: UploadedFile) => {
+    setPreviewFileData(file);
+    setShowPreviewModal(true);
+  };
+
   if (selectedFolder) {
     const folder = folders.find(f => f.id === selectedFolder);
     if (!folder) return null;
@@ -511,8 +519,7 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
               {folder.files.map(file => (
                 <Card 
                   key={file.id} 
-                  className="cursor-pointer hover:shadow-md transition-shadow"
-                  onClick={() => setPreviewFile(file)}
+                  className="hover:shadow-md transition-shadow"
                 >
                   <CardContent className="p-4 text-center">
                     {getFileIcon(file.type)}
@@ -531,6 +538,28 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
                           {Object.keys(file.metadata).length} metadatos
                         </div>
                       )}
+                    </div>
+                    
+                    {/* Botones de acción */}
+                    <div className="flex justify-center gap-2 mt-3">
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => setPreviewFile(file)}
+                        className="px-2"
+                        title="Ver información del archivo"
+                      >
+                        <FileText className="h-4 w-4" />
+                      </Button>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => handlePreviewFile(file)}
+                        className="px-2"
+                        title="Vista previa del contenido"
+                      >
+                        <Eye className="h-4 w-4" />
+                      </Button>
                     </div>
                   </CardContent>
                 </Card>
@@ -629,19 +658,19 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
 
         {/* Modal de confirmación para agregar conocimiento */}
         <Dialog open={showConfirmationModal} onOpenChange={setShowConfirmationModal}>
-          <DialogContent className="max-w-md">
-            <DialogHeader>
+          <DialogContent className="max-w-lg max-h-[80vh] flex flex-col">
+            <DialogHeader className="flex-shrink-0">
               <DialogTitle>Confirmar agregado de conocimiento</DialogTitle>
             </DialogHeader>
             
-            <div className="py-4">
-              <p className="text-sm text-gray-600 mb-4">
+            <div className="flex-1 overflow-hidden flex flex-col py-4">
+              <p className="text-sm text-gray-600 mb-4 flex-shrink-0">
                 ¿Estás seguro de que deseas agregar los siguientes archivos al asistente?
               </p>
               
-              <div className="max-h-60 overflow-y-auto space-y-2">
+              <div className="flex-1 overflow-y-auto space-y-2 pr-2">
                 {selectedFolder && folders.find(f => f.id === selectedFolder)?.files.map(file => (
-                  <div key={file.id} className="flex items-center space-x-3 p-2 bg-gray-50 rounded-lg">
+                  <div key={file.id} className="flex items-center space-x-3 p-3 bg-gray-50 rounded-lg">
                     <FileText className="h-4 w-4 text-blue-600 flex-shrink-0" />
                     <div className="flex-1 min-w-0">
                       <p className="text-sm font-medium text-gray-900 truncate">
@@ -651,32 +680,58 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
                         {formatFileSize(file.size)}
                       </p>
                     </div>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handlePreviewFile(file)}
+                      className="px-2 flex-shrink-0"
+                      title="Vista previa del contenido"
+                    >
+                      <Eye className="h-4 w-4" />
+                    </Button>
                   </div>
                 ))}
               </div>
               
-              <p className="text-xs text-gray-500 mt-4">
-                Total: {selectedFolder ? folders.find(f => f.id === selectedFolder)?.files.length || 0 : 0} archivo(s)
-              </p>
-            </div>
-            
-            <div className="flex space-x-2">
-              <Button 
-                variant="outline" 
-                onClick={() => setShowConfirmationModal(false)}
-                className="flex-1"
-              >
-                Cancelar
-              </Button>
-              <Button 
-                onClick={handleAddToAssistant}
-                className="flex-1"
-              >
-                Confirmar
-              </Button>
+              <div className="flex-shrink-0 mt-4 pt-4 border-t">
+                <p className="text-xs text-gray-500 mb-4">
+                  Total: {selectedFolder ? folders.find(f => f.id === selectedFolder)?.files.length || 0 : 0} archivo(s)
+                </p>
+                
+                <div className="flex space-x-2">
+                  <Button 
+                    variant="outline" 
+                    onClick={() => setShowConfirmationModal(false)}
+                    className="flex-1"
+                  >
+                    Cancelar
+                  </Button>
+                  <Button 
+                    onClick={handleAddToAssistant}
+                    className="flex-1"
+                  >
+                    Confirmar
+                  </Button>
+                </div>
+              </div>
             </div>
           </DialogContent>
         </Dialog>
+
+        {/* Modal de vista previa de archivos */}
+        {previewFileData && (
+          <FilePreviewModal
+            isOpen={showPreviewModal}
+            onClose={() => {
+              setShowPreviewModal(false);
+              setPreviewFileData(null);
+            }}
+            fileName={previewFileData.name}
+            fileType={previewFileData.type}
+            fileSize={previewFileData.size}
+            fileHash={previewFileData.hash}
+          />
+        )}
       </>
     );
   }

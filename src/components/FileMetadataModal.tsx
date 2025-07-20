@@ -149,26 +149,42 @@ export const FileMetadataModal = ({ isOpen, onClose, onSave, onSkip, fileName, f
         </div>
         
         <div className="flex space-x-2 pt-4">
-          <Button onClick={handleSave} className="flex-1">
-            Guardar Metadatos
-          </Button>
-          <Button 
-            variant="outline" 
-            onClick={handleSkip}
-            disabled={hasValidMetadata}
-            className="flex-1"
-            title={hasValidMetadata ? "Complete el guardado de metadatos o elimine los datos ingresados" : "Cargar archivo sin metadatos"}
-          >
-            Omitir
-          </Button>
-          <Button 
-            variant="ghost" 
-            onClick={handleCancel}
-            className="px-4"
-            title="Cancelar y no cargar el archivo"
-          >
-            Cancelar
-          </Button>
+          {hasValidMetadata ? (
+            // Solo mostrar Guardar y Cancelar si hay metadatos
+            <>
+              <Button onClick={handleSave} className="flex-1">
+                Guardar Metadatos
+              </Button>
+              <Button 
+                variant="outline" 
+                onClick={handleCancel}
+                className="flex-1"
+                title="Cancelar y no cargar el archivo"
+              >
+                Cancelar
+              </Button>
+            </>
+          ) : (
+            // Solo mostrar Omitir y Cancelar si no hay metadatos
+            <>
+              <Button 
+                variant="outline" 
+                onClick={handleSkip}
+                className="flex-1"
+                title="Cargar archivo sin metadatos"
+              >
+                Omitir
+              </Button>
+              <Button 
+                variant="ghost" 
+                onClick={handleCancel}
+                className="flex-1"
+                title="Cancelar y no cargar el archivo"
+              >
+                Cancelar
+              </Button>
+            </>
+          )}
         </div>
       </DialogContent>
     </Dialog>
