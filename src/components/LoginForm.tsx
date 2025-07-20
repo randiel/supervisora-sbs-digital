@@ -5,6 +5,7 @@ import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
 import { toast } from '@/hooks/use-toast';
 import { Loader2 } from 'lucide-react';
+import { SupportContactModal } from './SupportContactModal';
 
 interface LoginFormProps {
   onLogin: (email: string) => void;
@@ -12,6 +13,7 @@ interface LoginFormProps {
 
 export const LoginForm = ({ onLogin }: LoginFormProps) => {
   const [isLoading, setIsLoading] = useState(false);
+  const [isSupportModalOpen, setIsSupportModalOpen] = useState(false);
 
   const handleAzureLogin = async () => {
     setIsLoading(true);
@@ -67,27 +69,12 @@ export const LoginForm = ({ onLogin }: LoginFormProps) => {
           <CardHeader className="space-y-1 pb-6">
             <CardTitle className="text-xl text-center text-gray-800">Iniciar Sesión</CardTitle>
             <p className="text-sm text-gray-600 text-center">
-              Acceso exclusivo mediante Azure Active Directory
+              Inicia sesión con tu cuenta de usuario de la SBS
             </p>
           </CardHeader>
           <CardContent className="space-y-6">
             <div className="space-y-4">
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <div className="flex items-center space-x-3 mb-3">
-                  <div className="w-8 h-8 bg-blue-600 rounded flex items-center justify-center">
-                    <span className="text-white font-bold text-sm">MS</span>
-                  </div>
-                  <div>
-                    <h3 className="font-semibold text-gray-900">Microsoft Azure AD</h3>
-                    <p className="text-xs text-gray-600">Autenticación segura institucional</p>
-                  </div>
-                </div>
-                <p className="text-sm text-gray-700">
-                  Su identidad será verificada a través del directorio activo de Microsoft Azure de la SBS.
-                </p>
-              </div>
-
-              <Button 
+              <Button
                 onClick={handleAzureLogin}
                 disabled={isLoading}
                 className="w-full h-12 bg-blue-600 hover:bg-blue-700 text-white font-medium"
@@ -98,12 +85,7 @@ export const LoginForm = ({ onLogin }: LoginFormProps) => {
                     Autenticando...
                   </>
                 ) : (
-                  <>
-                    <div className="w-5 h-5 bg-white rounded mr-2 flex items-center justify-center">
-                      <span className="text-blue-600 font-bold text-xs">MS</span>
-                    </div>
-                    Iniciar sesión con Azure AD
-                  </>
+                  "Iniciar Sesión"
                 )}
               </Button>
 
@@ -113,12 +95,7 @@ export const LoginForm = ({ onLogin }: LoginFormProps) => {
                 </p>
                 <button 
                   className="text-xs text-blue-600 hover:text-blue-700 underline"
-                  onClick={() => {
-                    toast({
-                      title: "Soporte técnico",
-                      description: "Contacte al administrador del sistema para asistencia con Azure AD"
-                    });
-                  }}
+                  onClick={() => setIsSupportModalOpen(true)}
                 >
                   Contactar soporte técnico
                 </button>
@@ -136,6 +113,11 @@ export const LoginForm = ({ onLogin }: LoginFormProps) => {
           </p>
         </div>
       </div>
+      
+      <SupportContactModal 
+        isOpen={isSupportModalOpen}
+        onClose={() => setIsSupportModalOpen(false)}
+      />
     </div>
   );
 };
