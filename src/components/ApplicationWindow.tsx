@@ -103,7 +103,7 @@ export const ApplicationWindow = ({ application, user, onBack }: ApplicationWind
                   onClick={handleDocumentUpload}
                   className="w-full bg-primary hover:bg-primary/90"
                 >
-                  Carga Documental
+                  Sube tu documento
                 </Button>
                 
                 {!isBusquedaDocumental && (
