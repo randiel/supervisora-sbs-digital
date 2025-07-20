@@ -83,7 +83,8 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
   const [pendingFile, setPendingFile] = useState<PendingFile | null>(null);
   const [showMetadataModal, setShowMetadataModal] = useState(false);
   const [isLoadingToAssistant, setIsLoadingToAssistant] = useState(false);
-  const [loadingProgress, setLoadingProgress] = useState(0);
+  const [fileProgress, setFileProgress] = useState<Record<string, number>>({});
+  const [completedFiles, setCompletedFiles] = useState<Set<string>>(new Set());
   const [isLoadingComplete, setIsLoadingComplete] = useState(false);
 
   const generateFileHash = (fileName: string): string => {
@@ -186,36 +187,60 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
     if (!folder || folder.files.length === 0) return;
 
     setIsLoadingToAssistant(true);
-    setLoadingProgress(0);
+    setFileProgress({});
+    setCompletedFiles(new Set());
     setIsLoadingComplete(false);
     
     try {
-      // Duración aleatoria entre 5 y 60 segundos
-      const randomDuration = Math.floor(Math.random() * (60000 - 5000 + 1)) + 5000;
-      const intervalTime = 100; // Actualizar cada 100ms
-      const totalSteps = randomDuration / intervalTime;
-      let currentStep = 0;
+      // Inicializar progreso de todos los archivos en 0
+      const initialProgress: Record<string, number> = {};
+      folder.files.forEach(file => {
+        initialProgress[file.id] = 0;
+      });
+      setFileProgress(initialProgress);
 
-      const progressInterval = setInterval(() => {
-        currentStep++;
-        const progress = (currentStep / totalSteps) * 100;
-        setLoadingProgress(Math.min(progress, 100));
+      // Crear promesas para cada archivo con duraciones aleatorias
+      const filePromises = folder.files.map(file => {
+        return new Promise<void>((resolve) => {
+          // Duración aleatoria entre 3 y 45 segundos para cada archivo
+          const randomDuration = Math.floor(Math.random() * (45000 - 3000 + 1)) + 3000;
+          const intervalTime = 150; // Actualizar cada 150ms
+          const totalSteps = randomDuration / intervalTime;
+          let currentStep = 0;
 
-        if (currentStep >= totalSteps) {
-          clearInterval(progressInterval);
-          setIsLoadingToAssistant(false);
-          setIsLoadingComplete(true);
-          
-          toast({
-            title: "Conocimiento agregado exitosamente",
-            description: `${folder.files.length} archivo(s) fueron agregados al asistente`,
-          });
-        }
-      }, intervalTime);
+          const progressInterval = setInterval(() => {
+            currentStep++;
+            const progress = (currentStep / totalSteps) * 100;
+            
+            setFileProgress(prev => ({
+              ...prev,
+              [file.id]: Math.min(progress, 100)
+            }));
+
+            if (currentStep >= totalSteps) {
+              clearInterval(progressInterval);
+              setCompletedFiles(prev => new Set([...prev, file.id]));
+              resolve();
+            }
+          }, intervalTime);
+        });
+      });
+
+      // Esperar a que todos los archivos terminen
+      await Promise.all(filePromises);
+      
+      setIsLoadingToAssistant(false);
+      setIsLoadingComplete(true);
+      
+      toast({
+        title: "Conocimiento agregado exitosamente",
+        description: `${folder.files.length} archivo(s) fueron agregados al asistente`,
+      });
       
     } catch (error) {
       setIsLoadingToAssistant(false);
-      setLoadingProgress(0);
+      setFileProgress({});
+      setCompletedFiles(new Set());
       toast({
         title: "Error al agregar conocimiento",
         description: "Hubo un problema al cargar los archivos al asistente",
@@ -361,42 +386,53 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
                 </h3>
                 
                 <div className="space-y-4">
-                  {folder.files.map((file, index) => (
-                    <div key={file.id} className="flex items-center space-x-3 p-3 bg-white rounded-lg border">
-                      <div className="flex-shrink-0">
-                        {getFileIcon(file.type)}
-                      </div>
-                      
-                      <div className="flex-1 min-w-0">
-                        <p className="text-sm font-medium text-gray-900 truncate">
-                          {file.name}
-                        </p>
-                        <p className="text-xs text-gray-500">
-                          {formatFileSize(file.size)} • {file.hash}
-                        </p>
-                      </div>
-                      
-                      <div className="flex-shrink-0">
-                        {isLoadingComplete ? (
-                          <CheckCircle2 className="h-5 w-5 text-green-600" />
-                        ) : isLoadingToAssistant ? (
-                          <div className="flex items-center space-x-2">
-                            <div className="w-12 text-xs text-gray-600">
-                              {Math.round(loadingProgress)}%
+                  {folder.files.map((file, index) => {
+                    const fileProgressValue = fileProgress[file.id] || 0;
+                    const isFileCompleted = completedFiles.has(file.id);
+                    
+                    return (
+                      <div key={file.id} className="flex items-center space-x-3 p-3 bg-white rounded-lg border">
+                        <div className="flex-shrink-0">
+                          {getFileIcon(file.type)}
+                        </div>
+                        
+                        <div className="flex-1 min-w-0">
+                          <p className="text-sm font-medium text-gray-900 truncate">
+                            {file.name}
+                          </p>
+                          <p className="text-xs text-gray-500">
+                            {formatFileSize(file.size)} • {file.hash}
+                          </p>
+                        </div>
+                        
+                        <div className="flex-shrink-0">
+                          {isFileCompleted ? (
+                            <div className="flex items-center space-x-2">
+                              <CheckCircle2 className="h-5 w-5 text-green-600" />
+                              <span className="text-xs text-green-600 font-medium">Completado</span>
                             </div>
-                            <div className="w-16 bg-gray-200 rounded-full h-2">
-                              <div 
-                                className="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                                style={{ width: `${loadingProgress}%` }}
-                              ></div>
+                          ) : isLoadingToAssistant ? (
+                            <div className="flex items-center space-x-2">
+                              <div className="w-12 text-xs text-gray-600 text-right">
+                                {Math.round(fileProgressValue)}%
+                              </div>
+                              <div className="w-20 bg-gray-200 rounded-full h-2">
+                                <div 
+                                  className="bg-blue-600 h-2 rounded-full transition-all duration-300"
+                                  style={{ width: `${fileProgressValue}%` }}
+                                ></div>
+                              </div>
+                              {fileProgressValue > 0 && (
+                                <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-600"></div>
+                              )}
                             </div>
-                          </div>
-                        ) : (
-                          <div className="h-5 w-5"></div>
-                        )}
+                          ) : (
+                            <div className="h-5 w-5"></div>
+                          )}
+                        </div>
                       </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
                 
                 <div className="mt-4 p-3 bg-blue-50 rounded-lg">
@@ -404,14 +440,19 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
                     <div className="flex items-center text-green-800">
                       <CheckCircle2 className="h-5 w-5 mr-2" />
                       <span className="text-sm font-medium">
-                        ✅ Archivos analizados y agregados correctamente al contexto del agente
+                        ✅ Todos los archivos han sido analizados y agregados correctamente al contexto del agente
                       </span>
                     </div>
                   ) : isLoadingToAssistant ? (
-                    <div className="flex items-center text-blue-800">
-                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-800 mr-2"></div>
-                      <span className="text-sm">
-                        Analizando contenido y agregando al contexto del agente... {Math.round(loadingProgress)}%
+                    <div className="flex items-center justify-between text-blue-800">
+                      <div className="flex items-center">
+                        <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-800 mr-2"></div>
+                        <span className="text-sm">
+                          Analizando contenido y agregando al contexto del agente...
+                        </span>
+                      </div>
+                      <span className="text-sm font-medium">
+                        {completedFiles.size}/{folder.files.length} completados
                       </span>
                     </div>
                   ) : null}
