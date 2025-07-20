@@ -4,6 +4,7 @@ import { Card, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
+import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { ArrowLeft, Upload, Plus, FileText, X, Filter, CheckCircle2 } from 'lucide-react';
 import { FinancialEntity } from './FinancialSystemTree/types';
 import { Application } from '@/pages/Index';
@@ -86,6 +87,7 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
   const [fileProgress, setFileProgress] = useState<Record<string, number>>({});
   const [completedFiles, setCompletedFiles] = useState<Set<string>>(new Set());
   const [isLoadingComplete, setIsLoadingComplete] = useState(false);
+  const [showConfirmationModal, setShowConfirmationModal] = useState(false);
 
   const generateFileHash = (fileName: string): string => {
     // Generar un hash más realista basado en el nombre del archivo y timestamp
@@ -211,12 +213,22 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
     });
   };
 
+  const handleConfirmAddToAssistant = () => {
+    if (!selectedFolder) return;
+    
+    const folder = folders.find(f => f.id === selectedFolder);
+    if (!folder || folder.files.length === 0) return;
+
+    setShowConfirmationModal(true);
+  };
+
   const handleAddToAssistant = async () => {
     if (!selectedFolder) return;
     
     const folder = folders.find(f => f.id === selectedFolder);
     if (!folder || folder.files.length === 0) return;
 
+    setShowConfirmationModal(false);
     setIsLoadingToAssistant(true);
     setFileProgress({});
     setCompletedFiles(new Set());
@@ -371,10 +383,14 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
                 id="file-upload"
               />
               <label htmlFor="file-upload">
-                <Button className="cursor-pointer" asChild>
+                <Button 
+                  className="cursor-pointer" 
+                  asChild
+                  disabled={isLoadingToAssistant}
+                >
                   <div>
                     <Upload className="h-4 w-4 mr-2" />
-                    Cargar Archivos
+                    {isLoadingToAssistant ? 'Cargando...' : 'Cargar Archivos'}
                   </div>
                 </Button>
               </label>
@@ -384,7 +400,7 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
             {folder.files.length > 0 && (
               <div className="mb-6">
                 <Button 
-                  onClick={handleAddToAssistant}
+                  onClick={handleConfirmAddToAssistant}
                   disabled={isLoadingToAssistant || isLoadingComplete}
                   className={`transition-colors duration-200 ${
                     isLoadingComplete 
@@ -409,8 +425,8 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
               </div>
             )}
 
-            {/* Sección de progreso de carga contextual */}
-            {(isLoadingToAssistant || isLoadingComplete) && (
+            {/* Sección de progreso de carga contextual - solo mostrar si hay progreso real */}
+            {(isLoadingToAssistant || (isLoadingComplete && Object.keys(fileProgress).length > 0)) && (
               <div className="mb-6 p-6 bg-gray-50 rounded-lg border">
                 <h3 className="text-lg font-semibold text-gray-900 mb-4">
                   Carga Contextual de Archivos
@@ -610,6 +626,57 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
           fileName={pendingFile?.file.name || ''}
           fileHash={pendingFile?.hash || ''}
         />
+
+        {/* Modal de confirmación para agregar conocimiento */}
+        <Dialog open={showConfirmationModal} onOpenChange={setShowConfirmationModal}>
+          <DialogContent className="max-w-md">
+            <DialogHeader>
+              <DialogTitle>Confirmar agregado de conocimiento</DialogTitle>
+            </DialogHeader>
+            
+            <div className="py-4">
+              <p className="text-sm text-gray-600 mb-4">
+                ¿Estás seguro de que deseas agregar los siguientes archivos al asistente?
+              </p>
+              
+              <div className="max-h-60 overflow-y-auto space-y-2">
+                {selectedFolder && folders.find(f => f.id === selectedFolder)?.files.map(file => (
+                  <div key={file.id} className="flex items-center space-x-3 p-2 bg-gray-50 rounded-lg">
+                    <FileText className="h-4 w-4 text-blue-600 flex-shrink-0" />
+                    <div className="flex-1 min-w-0">
+                      <p className="text-sm font-medium text-gray-900 truncate">
+                        {file.name}
+                      </p>
+                      <p className="text-xs text-gray-500">
+                        {formatFileSize(file.size)}
+                      </p>
+                    </div>
+                  </div>
+                ))}
+              </div>
+              
+              <p className="text-xs text-gray-500 mt-4">
+                Total: {selectedFolder ? folders.find(f => f.id === selectedFolder)?.files.length || 0 : 0} archivo(s)
+              </p>
+            </div>
+            
+            <div className="flex space-x-2">
+              <Button 
+                variant="outline" 
+                onClick={() => setShowConfirmationModal(false)}
+                className="flex-1"
+              >
+                Cancelar
+              </Button>
+              <Button 
+                onClick={handleAddToAssistant}
+                className="flex-1"
+              >
+                Confirmar
+              </Button>
+            </div>
+          </DialogContent>
+        </Dialog>
       </>
     );
   }
