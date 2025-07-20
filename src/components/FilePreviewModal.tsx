@@ -1,6 +1,5 @@
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
-import { FileText, X } from 'lucide-react';
+import { FileText } from 'lucide-react';
 
 interface FilePreviewModalProps {
   isOpen: boolean;
@@ -136,30 +135,21 @@ El archivo ha sido procesado y catalogado correctamente en el sistema de gestió
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="max-w-4xl max-h-[80vh]">
-        <DialogHeader>
-          <div className="flex items-center justify-between">
-            <DialogTitle className="flex items-center gap-2">
-              <FileText className="h-5 w-5" />
-              Vista Previa del Documento
-            </DialogTitle>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={onClose}
-            >
-              <X className="h-4 w-4" />
-            </Button>
-          </div>
+      <DialogContent className="max-w-4xl max-h-[90vh] flex flex-col">
+        <DialogHeader className="flex-shrink-0">
+          <DialogTitle className="flex items-center gap-2">
+            <FileText className="h-5 w-5" />
+            Vista Previa del Documento
+          </DialogTitle>
         </DialogHeader>
         
-        <div className="space-y-4">
+        <div className="flex-1 overflow-hidden flex flex-col space-y-4">
           {/* Información del archivo */}
-          <div className="bg-gray-50 p-4 rounded-lg">
+          <div className="bg-gray-50 p-4 rounded-lg flex-shrink-0">
             <div className="grid grid-cols-2 gap-4 text-sm">
               <div>
                 <span className="font-medium text-gray-600">Nombre:</span>
-                <p className="text-gray-900">{actualFileName}</p>
+                <p className="text-gray-900 break-words">{actualFileName}</p>
               </div>
               <div>
                 <span className="font-medium text-gray-600">Tipo:</span>
@@ -171,7 +161,7 @@ El archivo ha sido procesado y catalogado correctamente en el sistema de gestió
               </div>
               <div>
                 <span className="font-medium text-gray-600">Hash:</span>
-                <p className="text-blue-600 font-mono text-xs">{actualFileHash}</p>
+                <p className="text-blue-600 font-mono text-xs break-all">{actualFileHash}</p>
               </div>
               {folderName && (
                 <div className="col-span-2">
@@ -183,15 +173,15 @@ El archivo ha sido procesado y catalogado correctamente en el sistema de gestió
           </div>
 
           {/* Contenido simulado */}
-          <div className="border rounded-lg p-4 bg-white max-h-96 overflow-y-auto">
-            <div className="flex items-center gap-2 mb-4 pb-2 border-b">
+          <div className="flex-1 overflow-hidden flex flex-col border rounded-lg bg-white min-h-0">
+            <div className="flex items-center gap-2 p-4 pb-3 border-b flex-shrink-0 bg-gray-50">
               <FileText className="h-4 w-4 text-gray-500" />
               <span className="text-sm font-medium text-gray-700">
                 Contenido del documento (vista previa simulada)
               </span>
             </div>
             
-            <div className="prose prose-sm max-w-none">
+            <div className="flex-1 overflow-y-auto p-4 min-h-0">
               <pre className="whitespace-pre-wrap text-sm text-gray-700 font-sans leading-relaxed">
                 {getSimulatedContent()}
               </pre>
@@ -199,7 +189,7 @@ El archivo ha sido procesado y catalogado correctamente en el sistema de gestió
           </div>
 
           {/* Nota informativa */}
-          <div className="bg-blue-50 p-3 rounded-lg">
+          <div className="bg-blue-50 p-3 rounded-lg flex-shrink-0">
             <p className="text-xs text-blue-800">
               <strong>Nota:</strong> Esta es una vista previa simulada del contenido. 
               El documento real será procesado por el asistente para análisis contextual.
