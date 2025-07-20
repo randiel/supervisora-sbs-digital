@@ -82,6 +82,7 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
   const [newFolderMonth, setNewFolderMonth] = useState('01');
   const [pendingFile, setPendingFile] = useState<PendingFile | null>(null);
   const [showMetadataModal, setShowMetadataModal] = useState(false);
+  const [isLoadingToAssistant, setIsLoadingToAssistant] = useState(false);
 
   const generateFileHash = (fileName: string): string => {
     // Generar un hash más realista basado en el nombre del archivo y timestamp
@@ -157,7 +158,8 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
   const addNewFolder = () => {
     if (!newFolderName.trim()) return;
     
-    const period = `${newFolderYear}${newFolderMonth.padStart(2, '0')}`;
+    // Usar el año y mes del filtro de periodo actual
+    const period = `${selectedYear}${selectedMonth.padStart(2, '0')}`;
     const newFolder: Folder = {
       id: `custom-${Date.now()}`,
       name: newFolderName,
@@ -167,14 +169,39 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
     
     setFolders(prev => [...prev, newFolder]);
     setNewFolderName('');
-    setNewFolderYear('2024');
-    setNewFolderMonth('01');
     setShowNewFolderForm(false);
     
     toast({
       title: "Carpeta creada",
       description: `Se ha creado la carpeta: ${newFolderName} (${period})`
     });
+  };
+
+  const handleAddToAssistant = async () => {
+    if (!selectedFolder) return;
+    
+    const folder = folders.find(f => f.id === selectedFolder);
+    if (!folder || folder.files.length === 0) return;
+
+    setIsLoadingToAssistant(true);
+    
+    try {
+      // Simular la carga al asistente
+      await new Promise(resolve => setTimeout(resolve, 2000));
+      
+      toast({
+        title: "Conocimiento agregado exitosamente",
+        description: `${folder.files.length} archivo(s) fueron agregados al asistente`,
+      });
+    } catch (error) {
+      toast({
+        title: "Error al agregar conocimiento",
+        description: "Hubo un problema al cargar los archivos al asistente",
+        variant: "destructive"
+      });
+    } finally {
+      setIsLoadingToAssistant(false);
+    }
   };
 
   // Filtrar carpetas por año y mes
@@ -276,6 +303,26 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
                 </Button>
               </label>
             </div>
+
+            {/* Botón para agregar conocimiento al asistente */}
+            {folder.files.length > 0 && (
+              <div className="mb-6">
+                <Button 
+                  onClick={handleAddToAssistant}
+                  disabled={isLoadingToAssistant}
+                  className="bg-green-600 hover:bg-green-700 text-white"
+                >
+                  {isLoadingToAssistant ? (
+                    <>
+                      <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-white mr-2"></div>
+                      Cargando al asistente...
+                    </>
+                  ) : (
+                    "Agregar conocimiento a Asistente"
+                  )}
+                </Button>
+              </div>
+            )}
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
               {folder.files.map(file => (
@@ -513,36 +560,13 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
                   />
                 </div>
                 
-                <div className="grid grid-cols-2 gap-4">
-                  <div>
-                    <Label htmlFor="folder-year">Año</Label>
-                    <Select value={newFolderYear} onValueChange={setNewFolderYear}>
-                      <SelectTrigger id="folder-year">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {availableYears.map(year => (
-                          <SelectItem key={year} value={year}>{year}</SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
-                  
-                  <div>
-                    <Label htmlFor="folder-month">Mes</Label>
-                    <Select value={newFolderMonth} onValueChange={setNewFolderMonth}>
-                      <SelectTrigger id="folder-month">
-                        <SelectValue />
-                      </SelectTrigger>
-                      <SelectContent>
-                        {availableMonths.map(month => (
-                          <SelectItem key={month.value} value={month.value}>
-                            {month.label}
-                          </SelectItem>
-                        ))}
-                      </SelectContent>
-                    </Select>
-                  </div>
+                <div className="bg-blue-50 p-3 rounded-lg">
+                  <p className="text-sm text-blue-800">
+                    <strong>Período seleccionado:</strong> {availableMonths.find(m => m.value === selectedMonth)?.label} {selectedYear}
+                  </p>
+                  <p className="text-xs text-blue-600 mt-1">
+                    La carpeta se creará para este período
+                  </p>
                 </div>
               </div>
               
@@ -555,8 +579,6 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
                   onClick={() => {
                     setShowNewFolderForm(false);
                     setNewFolderName('');
-                    setNewFolderYear('2024');
-                    setNewFolderMonth('01');
                   }}
                   className="flex-1"
                 >
