@@ -28,6 +28,7 @@ export const FinancialSystemTree = ({
     toggleNode,
     toggleFolder,
     toggleFileSelection,
+    toggleFolderSelection,
     filteredData,
     findEntityById
   } = useTreeState();
@@ -90,6 +91,21 @@ export const FinancialSystemTree = ({
         selectedFiles={selectedFiles}
         onToggleFolder={toggleFolder}
         onToggleFileSelection={handleToggleFileSelection}
+        onToggleFolderSelection={(folderId, folderFiles) => {
+          toggleFolderSelection(folderId, folderFiles);
+          if (onFilesSelected) {
+            // Calcular el nuevo count después del toggle de carpeta
+            const newSelectedFiles = new Set(selectedFiles);
+            const allFilesSelected = folderFiles.every(fileId => newSelectedFiles.has(fileId));
+            
+            if (allFilesSelected) {
+              folderFiles.forEach(fileId => newSelectedFiles.delete(fileId));
+            } else {
+              folderFiles.forEach(fileId => newSelectedFiles.add(fileId));
+            }
+            onFilesSelected(newSelectedFiles.size);
+          }
+        }}
         findEntityById={findEntityById}
         showFilesSelection={showFilesSelection}
       />

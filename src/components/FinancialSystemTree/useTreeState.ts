@@ -40,6 +40,28 @@ export const useTreeState = () => {
     setSelectedFiles(newSelected);
   };
 
+  const toggleFolderSelection = (folderId: string, folderFiles: string[]) => {
+    const newSelected = new Set(selectedFiles);
+    const allFilesSelected = folderFiles.every(fileId => newSelected.has(fileId));
+    
+    if (allFilesSelected) {
+      // Deseleccionar todos los archivos de la carpeta
+      folderFiles.forEach(fileId => newSelected.delete(fileId));
+    } else {
+      // Seleccionar todos los archivos de la carpeta
+      folderFiles.forEach(fileId => newSelected.add(fileId));
+    }
+    
+    setSelectedFiles(newSelected);
+  };
+
+  const handleEntityChange = (entityId: string | null) => {
+    setSelectedEntity(entityId);
+    // Reiniciar selecciones cuando cambie la entidad
+    setExpandedFolders(new Set());
+    setSelectedFiles(new Set());
+  };
+
   const filterNodes = (nodes: TreeNode[], searchTerm: string): TreeNode[] => {
     if (!searchTerm) return nodes;
 
@@ -86,7 +108,7 @@ export const useTreeState = () => {
   return {
     expandedNodes,
     selectedEntity,
-    setSelectedEntity,
+    setSelectedEntity: handleEntityChange,
     searchTerm,
     setSearchTerm,
     expandedFolders,
@@ -94,6 +116,7 @@ export const useTreeState = () => {
     toggleNode,
     toggleFolder,
     toggleFileSelection,
+    toggleFolderSelection,
     filteredData,
     findEntityById
   };

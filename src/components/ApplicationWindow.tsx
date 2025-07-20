@@ -104,14 +104,16 @@ export const ApplicationWindow = ({ application, user, onBack }: ApplicationWind
                   Carga Documental
                 </Button>
                 
-                <Button
-                  onClick={handleBatchAnalytics}
-                  disabled={!hasUploadedFiles}
-                  variant={hasUploadedFiles ? "default" : "secondary"}
-                  className="w-full"
-                >
-                  Cargar Contexto
-                </Button>
+                {!isBusquedaDocumental && (
+                  <Button
+                    onClick={handleBatchAnalytics}
+                    disabled={!hasUploadedFiles}
+                    variant={hasUploadedFiles ? "default" : "secondary"}
+                    className="w-full"
+                  >
+                    Cargar Contexto
+                  </Button>
+                )}
               </div>
             </div>
           )}
