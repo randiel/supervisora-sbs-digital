@@ -22,7 +22,7 @@ const TRANSVERSAL_APPLICATIONS: Application[] = [
   {
     id: 'busqueda-documental',
     name: 'Búsqueda Documental',
-    description: 'Sistema de gestión y búsqueda de documentos'
+    description: 'Herramienta enfocada en la búsqueda en documentos'
   }
 ];
 
@@ -30,19 +30,19 @@ const SPECIALIZED_APPLICATIONS: SpecializedApplication[] = [
   {
     id: 'garantias-preferidas',
     name: 'Evaluación de Garantías Preferidas',
-    description: 'Gestión y análisis de garantías preferidas del sistema financiero',
+    description: 'Herramienta especializada para el análisis y evaluación de garantías preferidas en instituciones financieras',
     topic: 'Confiabilidad de datos'
   },
   {
     id: 'cartas-fianza',
     name: 'Evaluación de Cartas Fianza',
-    description: 'Supervisión y control de cartas fianza emitidas en el sistema financiero',
+    description: 'Sistema integral de supervisión y evaluación de cartas fianza emitidas por entidades del sistema financiero',
     topic: 'Confiabilidad de datos'
   },
   {
     id: 'contratos-deuda-subordinada',
     name: 'Evaluación de Contratos de Deuda Subordinada',
-    description: 'Análisis y supervisión de contratos de deuda subordinada en el sistema financiero',
+    description: 'Plataforma avanzada para el análisis y supervisión de contratos de deuda subordinada y su impacto en la gestión de riesgos',
     topic: 'Supervisión de gestión de riesgos de mercado'
   }
 ];
@@ -176,7 +176,7 @@ export const Dashboard = ({ user, onSelectApp, onLogout }: DashboardProps) => {
                   Análisis Transversal
                 </h3>
                 <p className="text-gray-600 max-w-3xl">
-                  Estas herramientas permiten realizar análisis entre múltiples documentos y fuentes de información
+                  Estas herramientas permiten hacer análisis avanzados en base a documentos
                 </p>
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
@@ -193,7 +193,7 @@ export const Dashboard = ({ user, onSelectApp, onLogout }: DashboardProps) => {
                       Análisis Especializado
                     </h3>
                     <p className="text-gray-600 max-w-3xl">
-                      Estas herramientas están enfocadas a ciertos productos del sistema financiero y permiten realizar análisis cruzados
+                      Herramientas especializadas diseñadas para productos específicos del sistema financiero que permiten realizar análisis detallados y supervisión focalizada
                     </p>
                   </div>
                   
