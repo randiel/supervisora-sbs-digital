@@ -33,7 +33,7 @@ export const SupervisorAgent = ({ entity, onBack }: SupervisorAgentProps) => {
     {
       id: '1',
       type: 'agent',
-      content: 'Hola, soy el Agente Suptech. Estoy aquí para ayudarte a analizar los resultados del proceso de analítica batch y responder tus consultas sobre la supervisión de ' + entity.name + '. ¿En qué puedo asistirte?',
+      content: 'Hola, soy el Asistente Suptech. Estoy aquí para ayudarte a analizar los resultados del proceso de analítica batch y responder tus consultas sobre la supervisión de ' + entity.name + '. ¿En qué puedo asistirte?',
       timestamp: new Date(),
     }
   ]);
@@ -142,7 +142,7 @@ export const SupervisorAgent = ({ entity, onBack }: SupervisorAgentProps) => {
           </Button>
           
           <h2 className="text-2xl font-bold text-gray-900 mb-2">
-            Agente Suptech
+            Asistente Suptech
           </h2>
           <p className="text-gray-600">
             {entity.name} - {entity.license}
@@ -243,7 +243,7 @@ export const SupervisorAgent = ({ entity, onBack }: SupervisorAgentProps) => {
       <div className="w-80 border-l bg-gray-50 p-4">
         <Card>
           <CardHeader className="pb-3">
-            <CardTitle className="text-sm">Agente Suptech IA</CardTitle>
+            <CardTitle className="text-sm">Asistente Suptech IA</CardTitle>
           </CardHeader>
           <CardContent className="text-sm text-gray-600 space-y-2">
             <p>

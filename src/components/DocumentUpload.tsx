@@ -495,7 +495,7 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
                     <div className="flex items-center text-green-800">
                       <CheckCircle2 className="h-5 w-5 mr-2" />
                       <span className="text-sm font-medium">
-                        ✅ Todos los archivos han sido analizados y agregados correctamente al contexto del agente
+                        ✅ Todos los archivos han sido analizados y agregados correctamente al contexto del asistente
                       </span>
                     </div>
                   ) : isLoadingToAssistant ? (
@@ -503,7 +503,7 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
                       <div className="flex items-center">
                         <div className="animate-spin rounded-full h-4 w-4 border-b-2 border-blue-800 mr-2"></div>
                         <span className="text-sm">
-                          Analizando contenido y agregando al contexto del agente...
+                          Analizando contenido y agregando al contexto del asistente...
                         </span>
                       </div>
                       <span className="text-sm font-medium">

@@ -163,7 +163,7 @@ export const BatchAnalytics = ({ entity, onBack, onGoToAgent }: BatchAnalyticsPr
             className="w-full"
             disabled={results.length === 0}
           >
-            Agente Suptech
+            Asistente Suptech
           </Button>
         </div>
       </CardContent>

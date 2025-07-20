@@ -83,7 +83,7 @@ export const FileMetadataModal = ({ isOpen, onClose, onSave, onSkip, fileName, f
             Metadatos del Archivo
           </DialogTitle>
           <DialogDescription>
-            Agregue información adicional que ayude al agente a organizar y procesar este documento.
+            Agregue información adicional que ayude al asistente a organizar y procesar este documento.
           </DialogDescription>
         </DialogHeader>
         
