@@ -152,6 +152,37 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
     onFilesUploaded();
   };
 
+  const handleMetadataSkip = () => {
+    if (!pendingFile) return;
+
+    // Crear archivo sin metadatos
+    const uploadedFile: UploadedFile = {
+      id: Math.random().toString(36).substr(2, 9),
+      name: pendingFile.file.name,
+      type: pendingFile.file.type,
+      size: pendingFile.file.size,
+      hash: pendingFile.hash,
+      uploadDate: new Date(),
+      metadata: undefined // Sin metadatos
+    };
+
+    setFolders(prev => prev.map(folder => 
+      folder.id === pendingFile.datasetId 
+        ? { ...folder, files: [...folder.files, uploadedFile] }
+        : folder
+    ));
+
+    toast({
+      title: "Archivo cargado sin metadatos",
+      description: `${uploadedFile.name} se ha cargado con hash ${uploadedFile.hash}`,
+    });
+
+    // Limpiar estado
+    setPendingFile(null);
+    setShowMetadataModal(false);
+    onFilesUploaded();
+  };
+
   const handleMetadataModalClose = () => {
     // Solo cerrar el modal sin procesar el archivo
     setShowMetadataModal(false);
@@ -575,6 +606,7 @@ export const DocumentUpload = ({ entity, application, onBack, onFilesUploaded }:
           isOpen={showMetadataModal}
           onClose={handleMetadataModalClose}
           onSave={handleMetadataSave}
+          onSkip={handleMetadataSkip}
           fileName={pendingFile?.file.name || ''}
           fileHash={pendingFile?.hash || ''}
         />

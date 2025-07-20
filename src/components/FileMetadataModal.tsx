@@ -10,6 +10,7 @@ interface FileMetadataModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSave: (metadata: Record<string, string>) => void;
+  onSkip: () => void; // Nueva prop para manejar omitir
   fileName: string;
   fileHash: string;
 }
@@ -20,7 +21,7 @@ interface KeyValuePair {
   value: string;
 }
 
-export const FileMetadataModal = ({ isOpen, onClose, onSave, fileName, fileHash }: FileMetadataModalProps) => {
+export const FileMetadataModal = ({ isOpen, onClose, onSave, onSkip, fileName, fileHash }: FileMetadataModalProps) => {
   const [keyValuePairs, setKeyValuePairs] = useState<KeyValuePair[]>([
     { id: '1', key: '', value: '' }
   ]);
@@ -56,13 +57,22 @@ export const FileMetadataModal = ({ isOpen, onClose, onSave, fileName, fileHash 
     
     onSave(metadata);
     setKeyValuePairs([{ id: '1', key: '', value: '' }]);
-    onClose();
+  };
+
+  const handleSkip = () => {
+    setKeyValuePairs([{ id: '1', key: '', value: '' }]);
+    onSkip(); // Llamar a la función para cargar sin metadatos
   };
 
   const handleCancel = () => {
     setKeyValuePairs([{ id: '1', key: '', value: '' }]);
-    onClose();
+    onClose(); // Solo cerrar sin procesar el archivo
   };
+
+  // Verificar si hay metadatos válidos ingresados
+  const hasValidMetadata = keyValuePairs.some(pair => 
+    pair.key.trim() && pair.value.trim()
+  );
 
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
@@ -142,8 +152,22 @@ export const FileMetadataModal = ({ isOpen, onClose, onSave, fileName, fileHash 
           <Button onClick={handleSave} className="flex-1">
             Guardar Metadatos
           </Button>
-          <Button variant="outline" onClick={handleCancel} className="flex-1">
+          <Button 
+            variant="outline" 
+            onClick={handleSkip}
+            disabled={hasValidMetadata}
+            className="flex-1"
+            title={hasValidMetadata ? "Complete el guardado de metadatos o elimine los datos ingresados" : "Cargar archivo sin metadatos"}
+          >
             Omitir
+          </Button>
+          <Button 
+            variant="ghost" 
+            onClick={handleCancel}
+            className="px-4"
+            title="Cancelar y no cargar el archivo"
+          >
+            Cancelar
           </Button>
         </div>
       </DialogContent>
