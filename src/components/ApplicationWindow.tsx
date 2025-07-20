@@ -65,16 +65,15 @@ export const ApplicationWindow = ({ application, user, onBack }: ApplicationWind
             <div className="text-center py-12">
               <h3 className="text-xl font-semibold text-gray-900 mb-4">
                 {isBusquedaDocumental 
-                  ? "Seleccione una entidad supervisada"
+                  ? "Asistente de Supervisión"
                   : "Seleccione una entidad supervisada"
                 }
               </h3>
-              <p className="text-gray-600">
-                {isBusquedaDocumental
-                  ? "Elija una entidad supervisada, periodo y documento para iniciar la búsqueda documental."
-                  : "Elija una entidad del árbol para comenzar el proceso de supervisión"
-                }
-              </p>
+              {!isBusquedaDocumental && (
+                <p className="text-gray-600">
+                  Elija una entidad del árbol para comenzar el proceso de supervisión
+                </p>
+              )}
             </div>
           )}
         </div>
