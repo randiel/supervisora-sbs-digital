@@ -24,6 +24,8 @@ export const ApplicationWindow = ({ application, user, onBack }: ApplicationWind
 
   const handleEntitySelect = (entity: FinancialEntity) => {
     setSelectedEntity(entity);
+    // Reiniciar el contador de archivos seleccionados cuando cambie la entidad
+    setSelectedFilesCount(0);
   };
 
   const handleFilesSelected = (count: number) => {
